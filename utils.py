@@ -26,27 +26,65 @@ LAST_UPDATE_DATE = "2024-04-08"
 # Initialise the OpenAI client
 client = OpenAI(api_key=OPENAI_API_KEY)
 
+#def render_custom_css() -> None:
+#    """
+#    Aplico formatos CSS
+#    """
+#    st.html("""
+#            <style>
+#                #MainMenu {visibility: hidden}
+#                #header {visibility: hidden}
+#                #footer {visibility: hidden}
+#                .block-container {
+#                    padding-top: 3rem;
+#                    padding-bottom: 2rem;
+#                    padding-left: 3rem;
+#                    padding-right: 3rem;
+#                    }
+#            </style>
+#            """)
 def render_custom_css() -> None:
     """
-    Applies custom CSS
+    Aplico formatos CSS
     """
-    st.html("""
-            <style>
-                #MainMenu {visibility: hidden}
-                #header {visibility: hidden}
-                #footer {visibility: hidden}
-                .block-container {
-                    padding-top: 3rem;
-                    padding-bottom: 2rem;
-                    padding-left: 3rem;
-                    padding-right: 3rem;
-                    }
-            </style>
-            """)
+    st.markdown("""
+        <style>
+            #MainMenu {visibility: hidden}
+            #header {visibility: hidden}
+            #footer {visibility: hidden}
+            .block-container {
+                padding-top: 3rem;
+                padding-bottom: 2rem;
+                padding-left: 3rem;
+                padding-right: 3rem;
+            }
+            .button-container {
+                display: flex;
+                justify-content: space-between;
+                margin-top: 20px;
+            }
+            .button-container > div {
+                flex: 1;
+            }
+            .button-container > div:first-child {
+                margin-right: 10px;
+            }
+            .output-container {
+                width: 100%;
+                max-width: 100%;
+                margin-top: 10px;
+                display: flex;
+                flex-direction: column;
+            }
+            .output-container .stMarkdown {
+                width: 100%;
+            }
+        </style>
+    """, unsafe_allow_html=True)
 
 def initialise_session_state():
     """
-    Initialise session state variables
+    Inicializo las session state var
     """
     if "file" not in st.session_state:
         st.session_state.file = None
@@ -64,31 +102,31 @@ def initialise_session_state():
 
 def moderation_endpoint(text) -> bool:
     """
-    Checks if the text is triggers the moderation endpoint
+    Comprueba si el texto activa la moderación.
 
     Args:
-    - text (str): The text to check
+    - texto (str): El texto a comprobar.
 
     Returns:
-    - bool: True if the text is flagged
+    - bool: True si el texto está marcado.
     """
     response = client.moderations.create(input=text)
     return response.results[0].flagged
 
 def is_nsfw(text) -> bool:
     """
-    Checks if the text is nsfw.
+    Comprueba si el texto es inapropiado para el trabajo (NSFW).
 
     Args:
-    - text (str): The text to check
+    - texto (str): El texto a comprobar.
 
     Returns:
-    - bool: True if the text is nsfw
+    - bool: True si el texto es NSFW.
     """
     response = client.chat.completions.create(
         model="gpt-3.5-turbo",
         messages=[
-            {"role": "system", "content": "Is the given text NSFW? If yes, return `1``, else return `0`."},
+            {"role": "system", "content": "Is the given text NSFW? If yes, return 1, else return 0."},
             {"role": "user", "content": text},
         ],
         max_tokens=1,
@@ -100,18 +138,18 @@ def is_nsfw(text) -> bool:
 
 def is_not_question(text) -> bool:
     """
-    Checks if the text is not a question
+    Comprueba si el texto no es una pregunta.
 
     Args:
-    - text (str): The text to check
+    - texto (str): El texto a comprobar.
 
     Returns:
-    - bool: True if the text is not a question
+    - bool: True si el texto no es una pregunta.
     """
     response = client.chat.completions.create(
         model="gpt-3.5-turbo",
         messages=[
-            {"role": "system", "content": "Is the given text a question? If yes, return `1``, else return `0`."},
+            {"role": "system", "content": "Is the given text a question? If yes, return 1, else return 0."},
             {"role": "user", "content": text},
         ],
         max_tokens=1,
@@ -123,35 +161,38 @@ def is_not_question(text) -> bool:
 
 def delete_files(file_id_list: list[str]) -> None:
     """
-    Delete the file(s) uploaded
-    
+    Elimina el archivo o archivos subidos.
+
     Args:
-    - file_id_list (list[str]): List of file ids to delete
+    - file_id_list (list[str]): Lista de IDs de archivo a eliminar
     """
     for file_id in file_id_list:
         client.files.delete(file_id)
         print(f"Deleted file: \t {file_id}")
 
 def delete_thread(thread_id) -> None:
+    # Realiza la eliminación del hilo.
     """
-    Delete the thread
-    
+    Elimina el hilo de conversación.
+
     Args:
-    - thread_id (str): The id of the thread to delete
+    - thread_id (str): El ID del hilo a eliminar
     """
     client.beta.threads.delete(thread_id)
     print(f"Deleted thread: \t {thread_id}")
 
 def remove_links(text: str) -> str:
+    # Realiza la eliminación de enlaces.
     """
-    Remove links from the text
+    Elimina los enlaces del texto.
 
     Args:
-    - text (str): The text to remove markdown links from
+    - text (str): El texto del que se quieren eliminar los enlaces
 
     Returns:
-    - str: The text with the links removed
+    - str: El texto con los enlaces eliminados
     """
+    
     # Pattern to match Markdown links: [Link text](URL)
     link_pattern = r'\[.*?\]\(.*?\)'
     # Pattern to match lines starting with list item indicators (unordered or ordered)
@@ -164,15 +205,17 @@ def remove_links(text: str) -> str:
     return cleaned_text
 
 def retrieve_messages_from_thread(thread_id: str) -> list[str]:
+    # Realiza la obtención de mensajes del hilo.
     """
-    Retrieve messages from the thread
+    Obtiene los mensajes del hilo.
 
     Args:
-    - thread_id (str): The id of the thread
+    - thread_id (str): El id del hilo
 
     Returns:
-    - list[str]: List of assistant messages
+    - list[str]: Lista de mensajes del asistente
     """
+    
     thread_messages = client.beta.threads.messages.list(thread_id)
     assistant_messages = []
     for message in thread_messages.data:
@@ -233,7 +276,7 @@ def render_download_files(file_id_list: list[str]) -> Tuple[list[bytes], list[st
                 file_name = client.files.retrieve(file_id).filename
                 file_name = os.path.basename(file_name)
 
-                # # if file_name is `.csv`
+                # # if file_name is .csv
                 # if file_name.endswith(".csv"):
                 #     try:
                 #         with open(f"static/{file_name}", "wb") as f:
@@ -282,7 +325,7 @@ class EventHandler(AssistantEventHandler):
         """
         # This try-except block will update the earlier expander for code to complete.
         # Note the indexing. We are updating the x-1 textbox where x is the current textbox.
-        # Note how `on_tool_call_done` creates a new textbook (which is the x_th textbox, so we want to access the x-1_th)
+        # Note how on_tool_call_done creates a new textbook (which is the x_th textbox, so we want to access the x-1_th)
         # This is to address an edge case where code is executed, but there is no output textbox (e.g. a graph is created)
         try:
             st.session_state[f"code_expander_{len(st.session_state.text_boxes) - 1}"].update(state="complete", expanded=False)
@@ -292,7 +335,7 @@ class EventHandler(AssistantEventHandler):
         # Create a new text box
         st.session_state.text_boxes.append(st.empty())
         # Insert the text into the last element in assistant text list
-        st.session_state.assistant_text[-1] += "**> 🕵️ DAVE:** \n\n "
+        st.session_state.assistant_text[-1] += "**> 🕵️ BOOMIT AI:** \n\n "
         # Remove links from the text
         st.session_state.assistant_text[-1] = remove_links(st.session_state.assistant_text[-1])
         # Display the text in the newly created text box
@@ -336,7 +379,7 @@ class EventHandler(AssistantEventHandler):
         """
         if delta.type == "code_interpreter" and delta.code_interpreter:
 
-            # Code writen by the assistant to be executed
+           # Code writen by the assistant to be executed
             if delta.code_interpreter.input:
                 # Go to the last text box
                 with st.session_state.text_boxes[-1]:
