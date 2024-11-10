@@ -324,3 +324,8 @@ static/*.jpeg
 # Ignorar archivos de configuración de Streamlit
 .streamlit/config.toml
 .streamlit/secrets.toml
+
+# Ignorar archivos sensibles
+peigo-boomit.json
+credenciales.toml
+obtener_file_id.py
