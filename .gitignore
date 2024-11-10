@@ -320,3 +320,7 @@ static/*.png
 static/*.zip
 static/*.jpg
 static/*.jpeg
+
+# Ignorar archivos de configuración de Streamlit
+.streamlit/config.toml
+.streamlit/secrets.toml
