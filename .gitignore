@@ -328,4 +328,4 @@ static/*.jpeg
 # Ignorar archivos sensibles
 peigo-boomit.json
 credenciales.toml
-obtener_file_id.py
+
