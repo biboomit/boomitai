@@ -307,6 +307,7 @@ pyrightconfig.json
 
 *.pdf
 *.png
+!company_logo.png
 
 demo_screenshots/*
 
