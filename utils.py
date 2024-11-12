@@ -373,55 +373,41 @@ class EventHandler(AssistantEventHandler):
         # Create a new element in the code input list
         st.session_state.code_input.append("")
           
-    def on_tool_call_delta(self, delta: ToolCallDelta, snapshot: ToolCallDelta):
+    def on_tool_call_delta(self, delta: ToolCallDelta, snapshot: ToolCallDelta, show_output=False):
         """
         Handler for when a tool call delta is created
         """
         if delta.type == "code_interpreter" and delta.code_interpreter:
+            #if delta.code_interpreter.input:
+                # Ir a la última caja de texto
+                #with st.session_state.text_boxes[-1]:
+                    #if f"code_box_{len(st.session_state.text_boxes)}" not in st.session_state:
+                        # Expandir código en un contenedor
+                        #st.session_state[f"code_expander_{len(st.session_state.text_boxes)}"] = st.status("**💻 Code**", expanded=True)
+                        #st.session_state[f"code_box_{len(st.session_state.text_boxes)}"] = st.session_state[f"code_expander_{len(st.session_state.text_boxes)}"].empty()
 
-           # Code writen by the assistant to be executed
-            if delta.code_interpreter.input:
-                # Go to the last text box
-                with st.session_state.text_boxes[-1]:
-                    # Check if a code box for this accompanying text box index exists
-                    if f"code_box_{len(st.session_state.text_boxes)}" not in st.session_state:
-                        # Nest the code in an expander
-                        st.session_state[f"code_expander_{len(st.session_state.text_boxes)}"] = st.status("**💻 Code**", expanded=True)
-                        # Create an empty container which is the placeholder for the code box
-                        st.session_state[f"code_box_{len(st.session_state.text_boxes)}"] = st.session_state[f"code_expander_{len(st.session_state.text_boxes)}"].empty()
+                # Limpiar la caja de código
+                #st.session_state[f"code_box_{len(st.session_state.text_boxes)}"].empty()
+                #if delta.code_interpreter.input:
+                #    st.session_state.code_input[-1] += delta.code_interpreter.input
+                #st.session_state[f"code_box_{len(st.session_state.text_boxes)}"].code(st.session_state.code_input[-1])
 
-                # Clear the code box
-                st.session_state[f"code_box_{len(st.session_state.text_boxes)}"].empty()
-                # If there is code written, add it to the code input
-                if delta.code_interpreter.input:
-                    st.session_state.code_input[-1] += delta.code_interpreter.input
-                # Re-display the full code in the code box
-                st.session_state[f"code_box_{len(st.session_state.text_boxes)}"].code(st.session_state.code_input[-1])
-
-            # Output from the code executed by code interpreter
-            if delta.code_interpreter.outputs:
+            # Output generado por el código (solo si show_output es True)
+            if delta.code_interpreter.outputs and show_output:
                 for output in delta.code_interpreter.outputs:
                     if output.type == "logs":
-                        # This try-except block will update the earlier expander for code to complete.
-                        # Note the indexing, as we have not yet created a new text box for the code output.
                         try:
                             st.session_state[f"code_expander_{len(st.session_state.text_boxes)}"].update(state="complete", expanded=False)
                         except KeyError:
                             pass
-                        # Create a new element in the code input list, which is for the next code input
                         st.session_state.code_input.append("")
-                        # Create a new text box, which is for the code output
                         st.session_state.text_boxes.append(st.empty())
-                        # Nest the code output in an expander
                         st.session_state.text_boxes[-1] = st.expander(label="**🔎 Output**")
-                        # Create a new element in the code output list
                         st.session_state.code_output.append("")
-                        # Clear the latest text box which is for the code output
                         st.session_state.text_boxes[-1].empty()
-                        # Add the logs to the code output
                         st.session_state.code_output[-1] += f"\n\n{output.logs}"
-                        # Display the code output
                         st.session_state.text_boxes[-1].code(st.session_state.code_output[-1])
+
 
     def on_tool_call_done(self, tool_call: ToolCall):
         """

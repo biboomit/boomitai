@@ -571,12 +571,7 @@ if st.session_state.show_text_input:
             if "thread_id" not in st.session_state:
                 thread = client.beta.threads.create()
                 st.session_state.thread_id = thread.id
- 
-            # Actualizar el hilo para adjuntar el archivo
-            # client.beta.threads.update(
-            #     thread_id=st.session_state.thread_id,
-            #     tool_resources={"code_interpreter": {"file_ids": [st.session_state.file_id]}}
-            # )
+
  
             if "text_boxes" not in st.session_state:
                 st.session_state.text_boxes = []
