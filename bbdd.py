@@ -1,5 +1,8 @@
 from google.cloud import bigquery
 from google.oauth2 import service_account
+import json
+from google.cloud import bigquery
+import streamlit as st
 
 def queryBigQuery(query):
     credentials = service_account.Credentials.from_service_account_file(
@@ -53,15 +56,10 @@ def query_selector(client):
     return query
 
 def get_data(client):
+    # Parsear las credenciales desde el formato JSON serializado en secrets.toml
+    credentials_dict = json.loads(st.secrets["BIGQUERY_CREDENTIALS"])
+    bq_client = bigquery.Client.from_service_account_info(credentials_dict)
     query = query_selector(client)
-    bx_data = queryBigQuery(query)
+    bx_data = bq_client.query(query).to_dataframe()
+
     return bx_data
-
-
-
-
-# clientes_por_equipo = {
-# "equipo_verde": ["BONOXS", "LAFISE PN", "LAFISE RD", "LAFISE HN", "ALIGE"],
-# "equipo_amarillo": ["KASH", "DLOCALGO", "BANPAIS","PEIGO"],
-# "equipo_azul": ["ZAPIA", "HANDY", "BOOMIT"]
-# }
