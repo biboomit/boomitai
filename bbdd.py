@@ -5,9 +5,11 @@ from google.cloud import bigquery
 import streamlit as st
 
 def queryBigQuery(query):
-    credentials = service_account.Credentials.from_service_account_file(
-        'peigo-boomit.json', scopes=["https://www.googleapis.com/auth/cloud-platform"],
-    )
+    # Carga las credenciales desde secrets.toml
+    credentials_dict = json.loads(st.secrets["BIGQUERY_CREDENTIALS"])
+    credentials = service_account.Credentials.from_service_account_info(credentials_dict)
+    
+    # Inicializa el cliente de BigQuery con las credenciales cargadas
     client = bigquery.Client(credentials=credentials, project=credentials.project_id)
     query_job = client.query(query)
     df = query_job.to_dataframe()
