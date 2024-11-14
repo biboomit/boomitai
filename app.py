@@ -74,7 +74,7 @@ if "last_interaction" not in st.session_state:
  
  
 clientes_por_equipo = {
-    "equipo_verde": ["BONOXS", "LAFISE PN", "LAFISE RD", "LAFISE HN", "ALIGE"],
+    "equipo_verde": ["LAFISE PN", "LAFISE RD", "LAFISE HN", "ALIGE"],
     "equipo_amarillo": ["PEIGO", "KASH", "DLOCALGO", "BANPAIS"],
     "equipo_violeta": ["ZAPIA", "HANDY", "BOOMIT"]
 }
