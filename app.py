@@ -1,4 +1,5 @@
 import os
+import time
 import warnings
 from pandas.errors import SettingWithCopyWarning
 from datetime import datetime, timedelta
@@ -130,11 +131,13 @@ if show_client_dropdown:
         st.session_state.gbq_data['inversion'] = st.session_state.gbq_data['inversion'].replace(r'[\"\\]', '', regex=True)
         st.session_state.gbq_data['inversion'] = pd.to_numeric(st.session_state.gbq_data['inversion'], errors='coerce')
 
-        # Display a sample of the data to verify it has been loaded correctly
-        st.write(st.session_state.gbq_data)
+        # Checkbox para mostrar preview del DataFrame
+        if st.checkbox("Mostrar preview de los datos"):
+            # Display a sample of the data to verify it has been loaded correctly
+            st.write(st.session_state.gbq_data)
  
         # Ahora, en lugar de subir el archivo, almacena el DataFrame en la sesión para usarlo en prompts futuros
-        st.write("Los datos del cliente han sido cargados y están listos para usar en las consultas.")
+        #st.write("Los datos del cliente han sido cargados y están listos para usar en las consultas.")
 
         # Obtener la hora actual
         now = datetime.now()
@@ -151,22 +154,6 @@ if show_client_dropdown:
         # Initialise the OpenAI client, and retrieve the assistant
         client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
         assistant = client.beta.assistants.retrieve(st.secrets["ASSISTANT_ID_2"])
-        
-#         instrucciones = """ # Agregadas como parte de las instrucciones del asistente
-# Deberas analizar datos de rendimiento de inversiones publicitarias que te brindare en el prompt.
-# IMPORTANTE, es OBLIGATORIO que sigas estas pautas al contestar:
-# 1. Para el conjunto de datos proporcionado, Identifica atentamente la fecha más reciente respecto a hoy (tendría que ser la fecha de ayer. Por ejemplo, si hoy es 16 de julio, la fecha máxima tendría que ser 15 de julio.) y realiza todo el análisis comparando los datos de los últimos 7 días con los datos de los 7 días inmediatamente anteriores. Si no hay datos de la fecha de ayer, realiza todas las comparaciones tomando la última fecha que haya como ayer.
-# 2. Menciona explicitamente las fechas específicas de los dos intervalos de 7 días a analizar.
-# 3. Responde de manera breve y directa con datos precisos según la información proporcionada.
-# 4. La respuesta tiene que ser en español y debes evitar el lenguaje técnico.
-# 5. NUNCA describas las columnas del conjunto de datos y NUNCA incluyas ningún contexto inicial ni explicaciones sobre cómo realizarás el análisis.
-# 6. Dirígete directamente a los insights y observaciones, acompañados de soporte numérico, variaciones porcentuales, diferencias absolutas para el período analizado y el anterior, etc.
-# 7. Presenta los números claramente sin separar dígitos ni símbolos.
-# 8. No uses caracteres especiales entre números y porcentajes.
-# 9. Toda la información que menciones debe ser extraída de los datos proporcionados en el prompt.
-# 10. NUNCA describas las columnas del conjunto de datos y NUNCA incluyas ningún contexto inicial o explicaciones de cómo realizarás el análisis.
-# 11. Evita cualquier salida inicial que explique el conjunto de datos o sus columnas, o lo que se hará o se hizo relacionado con el proceso de salida.
-# 12. Centrate directamente en responder la pregunta del usuario o cumplir la tarea."""
         
         # Define una lista de prompts predefinidos
         prompts_abreviados = {
@@ -477,6 +464,12 @@ Análisis de Correlaciones:
         col1, col2 = st.columns([6, 1])
         with col1:
             if st.button("Preguntar a Boomit AI"):
+                st.caption('Procesando.Aguarde por favor...')
+                my_bar=st.progress(0)
+                for pct_complete in range(100):
+                    time.sleep(0.5)
+                    my_bar.progress(pct_complete)
+
                 question = prompts_abreviados[titulo_abreviado]  # Utiliza el prompt completo asociado al título abreviado
                 text_box.empty()
                 qn_btn.empty()
@@ -522,6 +515,8 @@ Análisis de Correlaciones:
                                                     temperature=0.3) as stream:
                     stream.until_done()
                     st.toast("BOOMIT AI ha terminado su análisis", icon="🕵️")
+                # Oculta la barra de progreso cuando finaliza
+                my_bar.empty()    
  
                 # Asegúrate de que `text_boxes` no esté vacío antes de intentar acceder a sus elementos
                 if st.session_state.text_boxes:
