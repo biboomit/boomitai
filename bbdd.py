@@ -3,6 +3,7 @@ from google.oauth2 import service_account
 import json
 from google.cloud import bigquery
 import streamlit as st
+from src.config.secrets import keys
 
 def queryBigQuery(query):
     # Carga las credenciales desde secrets.toml
@@ -53,7 +54,35 @@ def query_selector(client):
     elif client == 'TRDELPAL':
         query = """ TODO """
     elif client == 'THE YARD':
-        query = """ TODO """
+        query = """SELECT 
+                    Date as Fecha,
+                    Session_campaign as Campania,
+                    plataforma as Plataforma,
+                    SUM(cost) AS inversion,
+                    SUM(lead_typ) AS evento_objetivo,
+                    CASE 
+                        WHEN SUM(lead_typ) = 0 OR SUM(Sessions) = 0 THEN 0
+                        ELSE SUM(lead_typ) / SUM(Sessions) 
+                    END AS cvr 
+                    FROM (
+                    SELECT 
+                    Date,
+                    Session_campaign,
+                    (SELECT `dimensiones.Data_Cruda.codigo_plataforma`(SPLIT(Session_campaign, '_')[OFFSET(3)])) AS plataforma,
+                    lead_typ,
+                    CASE 
+                        WHEN lead_status = "Tour Scheduled" THEN leads 
+                        ELSE 0 
+                    END as Tour_Scheduled,
+                    cost,
+                    Sessions
+                    FROM `the-yard-boomit.Dash.vista_final` 
+                    WHERE Session_campaign LIKE '%BOOMIT%'
+                    AND Date >= (DATE_ADD(CURRENT_DATE(), INTERVAL -15 DAY)) 
+                    ) 
+                    where lead_typ != 0 
+                    GROUP BY fecha, Campania, plataforma
+                    order by fecha, Campania, plataforma"""
     if query is None:
         raise ValueError(f"Client '{client}' is not recognized.")
     
@@ -61,7 +90,8 @@ def query_selector(client):
 
 def get_data(client):
     # Parsear las credenciales desde el formato JSON serializado en secrets.toml
-    credentials_dict = json.loads(st.secrets["BIGQUERY_CREDENTIALS"])
+    
+    credentials_dict = json.loads(keys[client])
     bq_client = bigquery.Client.from_service_account_info(credentials_dict)
     query = query_selector(client)
     bx_data = bq_client.query(query).to_dataframe()

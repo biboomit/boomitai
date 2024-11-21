@@ -122,134 +122,144 @@ if show_client_dropdown:
     # Password validated, display client dropdown
     clientes = clientes_por_equipo.get(equipo_seleccionado, [])
     if clientes:
-        cliente_seleccionado = st.selectbox("Selecciona un cliente:", clientes, key="cliente_seleccionado")
-        st.write(f"Bienvenido al equipo {equipo_seleccionado.capitalize()}! Has seleccionado al cliente: {cliente_seleccionado}")
- 
-        # Get data from the database and store it in the session state
-        st.session_state.gbq_data = bbdd.get_data(cliente_seleccionado)
+        placeholder_option = "Seleccione un cliente"
+        # Update the list of client options to include the placeholder
+        clientes.insert(0, placeholder_option)
         
-        # Eliminar caracteres extraños como comillas dobles, barras invertidas, etc.
-        st.session_state.gbq_data['inversion'] = st.session_state.gbq_data['inversion'].replace(r'[\"\\]', '', regex=True)
-        st.session_state.gbq_data['inversion'] = pd.to_numeric(st.session_state.gbq_data['inversion'], errors='coerce')
-
-        # Checkbox para mostrar preview del DataFrame
-        if st.checkbox("Mostrar preview de los datos"):
-            # Display a sample of the data to verify it has been loaded correctly
-            st.write(st.session_state.gbq_data)
- 
-        # Ahora, en lugar de subir el archivo, almacena el DataFrame en la sesión para usarlo en prompts futuros
-        #st.write("Los datos del cliente han sido cargados y están listos para usar en las consultas.")
-
-        # Obtener la hora actual
-        now = datetime.now()
-        # Formatear la fecha y hora actual en el formato deseado
-        timestamp = now.strftime("%Y%m%d%H%M%S")
+        cliente_seleccionado = st.selectbox("Selecciona un cliente:", clientes, index=0, key="cliente_seleccionado")
         
-        file_name = f"{cliente_seleccionado}_{timestamp}_csvEnJsonl.jsonl"
-
-        if not st.session_state.file_id:
-            file_info = upload_file(st.session_state.gbq_data.to_csv(index=False), file_name)
-            st.session_state.file_id = file_info["id"]
-            st.session_state.files_to_delete.append(st.session_state.file_id)
-
-        # Initialise the OpenAI client, and retrieve the assistant
-        client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
-        assistant = client.beta.assistants.retrieve(st.secrets["ASSISTANT_ID_2"])
+        if cliente_seleccionado == placeholder_option:
+            cliente_seleccionado = None
+            
+        if cliente_seleccionado:    
         
-        # Define una lista de prompts predefinidos
-        prompts_abreviados = prompts
- 
-        # Selección de prompt abreviado
-        titulo_abreviado = st.selectbox("Seleccione un prompt:", list(prompts_abreviados.keys()))
-        text_box = st.empty()
-        qn_btn = st.empty()
- 
-        # Container for buttons
-        st.markdown('<div class="button-container">', unsafe_allow_html=True)
-        col1, col2 = st.columns([6, 1])
-        with col1:
-            if st.button("Preguntar a Boomit AI"):
-                st.caption('Procesando.Aguarde por favor...')
-                my_bar=st.progress(0)
-                for pct_complete in range(100):
-                    time.sleep(0.5)
-                    my_bar.progress(pct_complete)
+            st.write(f"Bienvenido al equipo {equipo_seleccionado.capitalize()}! Has seleccionado al cliente: {cliente_seleccionado}")
+    
+            # Get data from the database and store it in the session state
+            st.session_state.gbq_data = bbdd.get_data(cliente_seleccionado)
+            
+            # Eliminar caracteres extraños como comillas dobles, barras invertidas, etc.
+            st.session_state.gbq_data['inversion'] = st.session_state.gbq_data['inversion'].replace(r'[\"\\]', '', regex=True)
+            st.session_state.gbq_data['inversion'] = pd.to_numeric(st.session_state.gbq_data['inversion'], errors='coerce')
 
-                question = prompts_abreviados[titulo_abreviado]  # Utiliza el prompt completo asociado al título abreviado
-                text_box.empty()
-                qn_btn.empty()
- 
-                if moderation_endpoint(question):
-                    st.warning("Your question has been flagged. Refresh page to try again.")
-                    st.stop()
- 
-                # Create a new thread
-                if "thread_id" not in st.session_state:
-                    thread = client.beta.threads.create()
-                    st.session_state.thread_id = thread.id
- 
-                # Update the thread to attach the file
-                client.beta.threads.update(
-                    thread_id=st.session_state.thread_id,
-                    tool_resources={"code_interpreter": {"file_ids": [st.session_state.file_id]}}
-                )
-                
-                client.beta.threads.messages.create(
-                    thread_id=st.session_state.thread_id,
-                    role="user",
-                    content=[
-                        {
-                            "type": "text",
-                            "text": question  
-                        }
-                    ]
-                )
- 
-                with client.beta.threads.runs.stream(thread_id=st.session_state.thread_id,
-                                                    assistant_id=assistant.id,
-                                                    tool_choice={"type": "code_interpreter"},
-                                                    event_handler=EventHandler(),
-                                                    temperature=0.3) as stream:
-                    stream.until_done()
-                    st.toast("BOOMIT AI ha terminado su análisis", icon="🕵️")
-                # Oculta la barra de progreso cuando finaliza
-                my_bar.empty()    
- 
-                # Asegúrate de que `text_boxes` no esté vacío antes de intentar acceder a sus elementos
-                if st.session_state.text_boxes:
+            # Checkbox para mostrar preview del DataFrame
+            if st.checkbox("Mostrar preview de los datos"):
+                # Display a sample of the data to verify it has been loaded correctly
+                st.write(st.session_state.gbq_data)
+    
+            # Ahora, en lugar de subir el archivo, almacena el DataFrame en la sesión para usarlo en prompts futuros
+            #st.write("Los datos del cliente han sido cargados y están listos para usar en las consultas.")
+
+            # Obtener la hora actual
+            now = datetime.now()
+            # Formatear la fecha y hora actual en el formato deseado
+            timestamp = now.strftime("%Y%m%d%H%M%S")
+            
+            file_name = f"{cliente_seleccionado}_{timestamp}_csvEnJsonl.jsonl"
+
+            if not st.session_state.file_id:
+                file_info = upload_file(st.session_state.gbq_data.to_csv(index=False), file_name)
+                st.session_state.file_id = file_info["id"]
+                st.session_state.files_to_delete.append(st.session_state.file_id)
+
+            # Initialise the OpenAI client, and retrieve the assistant
+            client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
+            assistant = client.beta.assistants.retrieve(st.secrets["ASSISTANT_ID_2"])
+            
+            # Define una lista de prompts predefinidos
+            prompts_abreviados = prompts
+    
+            # Selección de prompt abreviado
+            titulo_abreviado = st.selectbox("Seleccione un prompt:", list(prompts_abreviados.keys()))
+            text_box = st.empty()
+            qn_btn = st.empty()
+    
+            # Container for buttons
+            st.markdown('<div class="button-container">', unsafe_allow_html=True)
+            col1, col2 = st.columns([6, 1])
+            with col1:
+                if st.button("Preguntar a Boomit AI"):
+                    st.caption('Procesando.Aguarde por favor...')
+                    my_bar=st.progress(0)
+                    for pct_complete in range(100):
+                        time.sleep(0.5)
+                        my_bar.progress(pct_complete)
+
+                    question = prompts_abreviados[titulo_abreviado]  # Utiliza el prompt completo asociado al título abreviado
+                    text_box.empty()
+                    qn_btn.empty()
+    
+                    if moderation_endpoint(question):
+                        st.warning("Your question has been flagged. Refresh page to try again.")
+                        st.stop()
+    
+                    # Create a new thread
+                    if "thread_id" not in st.session_state:
+                        thread = client.beta.threads.create()
+                        st.session_state.thread_id = thread.id
+    
+                    # Update the thread to attach the file
+                    client.beta.threads.update(
+                        thread_id=st.session_state.thread_id,
+                        tool_resources={"code_interpreter": {"file_ids": [st.session_state.file_id]}}
+                    )
+                    
+                    client.beta.threads.messages.create(
+                        thread_id=st.session_state.thread_id,
+                        role="user",
+                        content=[
+                            {
+                                "type": "text",
+                                "text": question  
+                            }
+                        ]
+                    )
+    
+                    with client.beta.threads.runs.stream(thread_id=st.session_state.thread_id,
+                                                        assistant_id=assistant.id,
+                                                        tool_choice={"type": "code_interpreter"},
+                                                        event_handler=EventHandler(),
+                                                        temperature=0.3) as stream:
+                        stream.until_done()
+                        st.toast("BOOMIT AI ha terminado su análisis", icon="🕵️")
+                    # Oculta la barra de progreso cuando finaliza
+                    my_bar.empty()    
+    
+                    # Asegúrate de que `text_boxes` no esté vacío antes de intentar acceder a sus elementos
+                    if st.session_state.text_boxes:
+                        st.session_state.assistant_text[0] = st.session_state.text_boxes[-1]
+                    else:
+                        st.error("No hay respuestas disponibles del asistente.")
+    
+                    # Save the assistant's response
                     st.session_state.assistant_text[0] = st.session_state.text_boxes[-1]
-                else:
-                    st.error("No hay respuestas disponibles del asistente.")
- 
-                # Save the assistant's response
-                st.session_state.assistant_text[0] = st.session_state.text_boxes[-1]
- 
-                # Prepare the files for download
-                with st.spinner("Preparing the files for download..."):
-                    # Retrieve the messages by the Assistant from the thread
-                    assistant_messages = retrieve_messages_from_thread(st.session_state.thread_id)
-                    # For each assistant message, retrieve the file(s) created by the Assistant
-                    st.session_state.assistant_created_file_ids = retrieve_assistant_created_files(assistant_messages)
-                    # Download these files
-                    st.session_state.download_files, st.session_state.download_file_names = render_download_files(st.session_state.assistant_created_file_ids)
- 
-                # Clean-up
-                # Delete the file(s) created by the Assistant
-                delete_files(st.session_state.assistant_created_file_ids)
- 
-                # Set show_text_input to True to show the text input for another query
-                st.session_state.show_text_input = True
- 
-        with col2:
-            if st.button("Log Out", key="logout_button", help="Cerrar sesión y limpiar archivos"):
-                if st.session_state.files_to_delete:
-                    delete_files(st.session_state.files_to_delete)
-                    st.success("Done!")
-                    st.session_state.files_to_delete = []
- 
-        # Close the container div
-        st.markdown('</div>', unsafe_allow_html=True)
- 
+    
+                    # Prepare the files for download
+                    with st.spinner("Preparing the files for download..."):
+                        # Retrieve the messages by the Assistant from the thread
+                        assistant_messages = retrieve_messages_from_thread(st.session_state.thread_id)
+                        # For each assistant message, retrieve the file(s) created by the Assistant
+                        st.session_state.assistant_created_file_ids = retrieve_assistant_created_files(assistant_messages)
+                        # Download these files
+                        st.session_state.download_files, st.session_state.download_file_names = render_download_files(st.session_state.assistant_created_file_ids)
+    
+                    # Clean-up
+                    # Delete the file(s) created by the Assistant
+                    delete_files(st.session_state.assistant_created_file_ids)
+    
+                    # Set show_text_input to True to show the text input for another query
+                    st.session_state.show_text_input = True
+    
+            with col2:
+                if st.button("Log Out", key="logout_button", help="Cerrar sesión y limpiar archivos"):
+                    if st.session_state.files_to_delete:
+                        delete_files(st.session_state.files_to_delete)
+                        st.success("Done!")
+                        st.session_state.files_to_delete = []
+    
+            # Close the container div
+            st.markdown('</div>', unsafe_allow_html=True)
+    
 # Mostrar cuadro de texto para realizar otra consulta solo si se generó un output previo
 if st.session_state.show_text_input:
     consulta_libre = st.text_area("Realice otra consulta:", "")
