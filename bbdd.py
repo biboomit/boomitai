@@ -50,8 +50,10 @@ def query_selector(client):
                         AND fecha >= (DATE_ADD(CURRENT_DATE(), INTERVAL -15 DAY)) 
                     ) 
                     GROUP BY fecha, Campaign, plataforma"""
-                       # Se cambia a 15 dias por el tamaño del modelo actual (16k tokens)
-    
+    elif client == 'TRDELPAL':
+        query = """ TODO """
+    elif client == 'THE YARD':
+        query = """ TODO """
     if query is None:
         raise ValueError(f"Client '{client}' is not recognized.")
     
