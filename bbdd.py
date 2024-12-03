@@ -25,11 +25,11 @@ def query_selector(client):
                     Campaign as Campania,
                     plataforma as Plataforma,
                     SUM(total_cost) AS inversion,
-                    SUM(virtualcard_activation_success_UU) AS evento_objetivo,
+                    SUM(bankaccount_created_UU) AS evento_objetivo,
                     SUM(install) AS Instalaciones,
                     CASE 
-                        WHEN SUM(virtualcard_activation_success_UU) = 0 OR SUM(install) = 0 THEN 0
-                        ELSE SUM(virtualcard_activation_success_UU) / SUM(install) 
+                        WHEN SUM(bankaccount_created_UU) = 0 OR SUM(install) = 0 THEN 0
+                        ELSE SUM(bankaccount_created_UU) / SUM(install) 
                     END AS cvr 
                     FROM (
                     SELECT 
@@ -37,7 +37,7 @@ def query_selector(client):
                         Campaign,
                         (SELECT `dimensiones.Data_Cruda.codigo_plataforma`(SPLIT(Campaign, '_')[OFFSET(3)])) AS plataforma,
                         total_cost,
-                        virtualcard_activation_success_UU,
+                        bankaccount_created_UU,
                         install
                     FROM `peigo-boomit.Datos_Dash.Android_IOS_Raw_AF`
                     WHERE Campaign LIKE '%BOOMIT%'
