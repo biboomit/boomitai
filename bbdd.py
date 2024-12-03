@@ -42,6 +42,9 @@ def query_selector(client):
                     FROM `peigo-boomit.Datos_Dash.Android_IOS_Raw_AF`
                     WHERE Campaign LIKE '%BOOMIT%'
                         AND fecha >= (DATE_ADD(CURRENT_DATE(), INTERVAL -15 DAY)) 
+                        AND (SELECT `dimensiones.Data_Cruda.codigo_estrategia`(SPLIT(Campaign, '_')[OFFSET(4)])) 
+                            IN UNNEST(['PERFORMANCE', 'PURCHASE', 'TRAFICO', 'ADQUISICION', 'RETENCION', 
+                            'RECOMPRADORES', 'RETENCION Y RECOMPRADORES', 'CAPTACION', 'RETARGETING'])
                     ) 
                     GROUP BY fecha, Campaign, plataforma"""
     elif client == ProyectosNames.THEYARD.value:
