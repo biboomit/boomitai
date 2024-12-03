@@ -46,7 +46,8 @@ def query_selector(client):
                             IN UNNEST(['PERFORMANCE', 'PURCHASE', 'TRAFICO', 'ADQUISICION', 'RETENCION', 
                             'RECOMPRADORES', 'RETENCION Y RECOMPRADORES', 'CAPTACION', 'RETARGETING'])
                     ) 
-                    GROUP BY fecha, Campaign, plataforma"""
+                    GROUP BY fecha, Campaign, plataforma
+                    HAVING SUM(total_cost) > 0"""
     elif client == ProyectosNames.THEYARD.value:
         query = """ TODO """
     elif client == 'TRDELPAL':
