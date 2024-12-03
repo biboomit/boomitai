@@ -1,7 +1,8 @@
 import streamlit as st
+from .proyectos_names import ProyectosNames
 
 keys = []
 keys = {
-    "PEIGO": st.secrets["BIGQUERY_CREDENTIALS_PEIGO"],
-    "THEYARD": st.secrets["BIGQUERY_CREDENTIALS_THEYARD"]
+    ProyectosNames.PEIGO.value: st.secrets["BIGQUERY_CREDENTIALS_PEIGO"],
+    ProyectosNames.THEYARD.value: st.secrets["BIGQUERY_CREDENTIALS_THEYARD"]
 }

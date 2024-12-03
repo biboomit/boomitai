@@ -1,4 +1,5 @@
 from google.cloud import bigquery
+from src.config.proyectos_names import ProyectosNames
 from google.oauth2 import service_account
 import json
 from google.cloud import bigquery
@@ -18,15 +19,7 @@ def queryBigQuery(query):
 
 def query_selector(client):
     query = None
-    if client == 'BONOXS':
-        query = """SELECT * 
-                   FROM `bonoxs-boomit.Dashboard.Vista_General_Unificada_Web-App_v2`
-                   WHERE Date >= (DATE_ADD(CURRENT_DATE(), INTERVAL -10 DAY))"""
-    elif client == 'LAFISE PN':
-        query = """SELECT * 
-                   FROM `lafise-panama.Dashboard.vista_test_IA`
-                   WHERE date >= (DATE_ADD(CURRENT_DATE(), INTERVAL -60 DAY))"""
-    elif client == 'PEIGO':
+    if client == ProyectosNames.PEIGO.value:
         query = """SELECT 
                     fecha as Fecha,
                     Campaign as Campania,
@@ -51,38 +44,12 @@ def query_selector(client):
                         AND fecha >= (DATE_ADD(CURRENT_DATE(), INTERVAL -15 DAY)) 
                     ) 
                     GROUP BY fecha, Campaign, plataforma"""
+    elif client == ProyectosNames.THEYARD.value:
+        query = """ TODO """
     elif client == 'TRDELPAL':
         query = """ TODO """
-    elif client == 'THE YARD':
-        query = """SELECT 
-                    Date as Fecha,
-                    Session_campaign as Campania,
-                    plataforma as Plataforma,
-                    SUM(cost) AS inversion,
-                    SUM(lead_typ) AS evento_objetivo,
-                    CASE 
-                        WHEN SUM(lead_typ) = 0 OR SUM(Sessions) = 0 THEN 0
-                        ELSE SUM(lead_typ) / SUM(Sessions) 
-                    END AS cvr 
-                    FROM (
-                    SELECT 
-                    Date,
-                    Session_campaign,
-                    (SELECT `dimensiones.Data_Cruda.codigo_plataforma`(SPLIT(Session_campaign, '_')[OFFSET(3)])) AS plataforma,
-                    lead_typ,
-                    CASE 
-                        WHEN lead_status = "Tour Scheduled" THEN leads 
-                        ELSE 0 
-                    END as Tour_Scheduled,
-                    cost,
-                    Sessions
-                    FROM `the-yard-boomit.Dash.vista_final` 
-                    WHERE Session_campaign LIKE '%BOOMIT%'
-                    AND Date >= (DATE_ADD(CURRENT_DATE(), INTERVAL -15 DAY)) 
-                    ) 
-                    where lead_typ != 0 
-                    GROUP BY fecha, Campania, plataforma
-                    order by fecha, Campania, plataforma"""
+    elif client == 'LAFISE PN':
+        query = """ TODO"""
     if query is None:
         raise ValueError(f"Client '{client}' is not recognized.")
     

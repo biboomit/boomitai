@@ -18,7 +18,9 @@ from utils import (
     retrieve_messages_from_thread,
     retrieve_assistant_created_files,
 )
-from propmt import prompts
+from src.promptsManager.propmtBase import prompts
+from src.config.proyectos_names import ProyectosNames
+
  
 warnings.filterwarnings("ignore")
 warnings.simplefilter(action='ignore', category=(SettingWithCopyWarning))
@@ -76,9 +78,9 @@ if "last_interaction" not in st.session_state:
  
  
 clientes_por_equipo = {
-    "equipo_verde": ["LAFISE PN", "LAFISE RD", "LAFISE HN", "ALIGE"],
-    "equipo_amarillo": ["PEIGO", "KASH", "DLOCALGO", "BANPAIS"],
-    "equipo_violeta": ["ZAPIA", "HANDY", "BOOMIT"]
+    "equipo_verde": [], # ["LAFISE PN", "LAFISE RD", "LAFISE HN", "ALIGE"],
+    "equipo_amarillo": [ProyectosNames.PEIGO.value], # ["PEIGO", "KASH", "DLOCALGO", "BANPAIS"],
+    "equipo_violeta": [ProyectosNames.THEYARD.value] # ["BOOMIT", "THEYARD"]
 }
  
 # Define a placeholder option
