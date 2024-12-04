@@ -1,0 +1,26 @@
+1- Exclusion de datos:
+      Excluye los medios con 0 eventos_objetivo del análisis.
+
+2- Plataformas a analizar:
+      Incluye todas las plataformas presentes en los datos. Por ejemplo, TikTok, Google, Meta/Facebook, etc.
+
+3- Analisis por plataforma: 
+   - Para cada plataforma, calcula y reporta para ambos períodos de 7 días:
+   - Calculos para el periodo anterior:
+      Costo medio por evento_objetivo = (Suma total de inversión del período) / (Suma total de eventos_objetivo del período)
+   - Calculos para el periodo actual:
+      Costo medio por evento_objetivo = (Suma total de inversión del período) / (Suma total de eventos_objetivo del período)
+   - Compara los períodos:
+      Calcula el porcentaje de variación del costo medio entre períodos usando las fórmulas ajustadas anteriores
+
+4- Puntos de interés a destacar:
+   - Para cada plataforma, analiza y reporta:
+      a) La variación porcentual del costo medio entre períodos
+
+5- Formato de respuesta: 
+    Estructura tu respuesta de la siguiente manera:
+   a) Resumen general:
+      - Especificar el rango total de fechas analizadas
+      - Indicar claramente los dos períodos que se comparan (período anterior y período actual)
+   c) Conclusiones y recomendaciones basadas en el análisis.
+

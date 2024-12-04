@@ -104,6 +104,8 @@ class Titles(Enum):
 
 class Prompt1:
    def __init__(self):
+      self.whitespace = "    "
+      
       self.prompt = [
          # Paso 1: Exclusion de datos
          [
@@ -165,31 +167,33 @@ class Prompt1:
       self.titles = [
          "Exclusion de datos:",
          "Plataformas a analizar:",
-         "Analisis por plataforma:",
+         f'Analisis por plataforma: \n   - Para cada plataforma, calcula y reporta para ambos períodos de 7 días:',
          "Puntos de interés a destacar:",
-         "Formato de respuesta: \nEstructura tu respuesta de la siguiente manera:"
+         f'Formato de respuesta: \n{self.whitespace}Estructura tu respuesta de la siguiente manera:'
       ]
       
       self.subTitles = [
          [],
          [],
          [
-            "Calculos para la comparacion de los periodos:",
-            "Calculos para el periodo actual:",
-            "Comparacion de los periodos:"
+            "- Calculos para el periodo anterior:",
+            "- Calculos para el periodo actual:",
+            "- Compara los períodos:"
          ],
          [
-            "Para cada plataforma, analiza y reporta:",
-            "Ejemplo de análisis esperado:"
+            "- Para cada plataforma, analiza y reporta:",
+            "- Ejemplo de análisis esperado:"
          ],
          [
             [
                "Resumen general:",
-               "Analisis por plataforma:",
+               f'Analisis por plataforma: \n{self.whitespace}Para cada plataforma, usar el siguiente formato: \n{self.whitespace}[Nombre de la Plataforma]: \n{self.whitespace}Un párrafo que describa:',
                "Conclusiones y recomendaciones basadas en el análisis."
             ]
          ]
       ]
+      
+      self.whitespace = "   "
       
       # Ejemplo de uso: [[01], [0101], [000], [111], [1]]
       
@@ -205,60 +209,55 @@ class Prompt1:
    # Ejemplo de uso: [[01], [0101], [000], [111], [1]]
    def createPrompt(self, keys):
       self.verifyKeys(keys)
-      # print(keys)
       prompt = ""
       for i in range(len(keys)):
-         prompt += self.titles[i] + "\n"
-         prompt += self.obtainComponent(keys[i], i) + "\n"
+         prompt += (i+1).__str__() + "- " + self.titles[i] + "\n"
+         prompt += self.obtainComponentHandler(keys[i], i) + "\n"
       return prompt
    
    # Ejemplo de uso: [0101]
    # Al verificar por == 1, si es cualquier otro valor se excluye asumiendo como 0
-   def obtainComponent(self, key, paso):
+   def obtainComponent(self, key, paso, index = 0):
       prompt = ""
-      # print("obtainComponent")
-      print("----------todo--------------")
-      print("key: ", key)
-      print("--------inicio------------")
-      for i in range(len(key)):
-         print("key[i]: ", key[i])
-         # print("i: ", i)
-         if paso == 0: #paso1
-            if key[0][i] == '1':
-               # print("promt 1")
+      if paso == 0 or paso == 1: #paso1 y paso2
+         for i in range(len(key)):
+            if key[i] == '1':
+               prompt += self.whitespace * 2
                prompt += self.prompt[paso][i] + "\n"
-            # else:
-               # print("no promt 1")
-         elif paso == 1: #paso2
-            # print("promt 2")
-            if key[0][i] == '1':
-               prompt += self.prompt[paso][i] + "\n"
-         elif paso == 2: #paso3
-            # print("promt 3")
-            if '1' in key[i]:
-               prompt += self.subTitles[paso][i] + "\n"
-               for j in range(len(key[i])):
-                  if key[i][j] == '1':
-                     prompt += self.prompt[paso][i][j] + "\n"
-         elif paso == 3: #paso4
-            # print("promt 4")
-            if '1' in key[i]:
-               prompt += self.subTitles[paso][i] + "\n"
-               for j in range(len(key[i])):
-                  if key[i][j] == '1':
-                     prompt += self.prompt[paso][i][j] + "\n"
-         elif paso == 4: #paso5
-            # print("promt 5")
-            for j in range(len(key[i])):
-               if '1' in key[i][j]:
-                  prompt += self.subTitles[paso][i][j] + "\n"
-                  for k in range(len(key[i][j])):
-                     if key[i][j][k] == '1':
-                        prompt += self.prompt[paso][i][j][k] + "\n"
-         # print("prompt: ", prompt)
-         
-      print("-------fin-------------")   
-      return prompt      
+      elif paso == 2 or paso == 3: #paso3 y paso4
+         if '1' in key:
+            prompt += self.whitespace
+            prompt += self.subTitles[paso][index] + "\n"
+            for i in range(len(key)):
+               if key[i] == '1':
+                  prompt += self.whitespace * 2
+                  prompt += self.prompt[paso][index][i] + "\n"
+      elif paso == 4: #paso5
+         if '1' in key:
+            prompt += self.whitespace
+            prompt += chr(96 + (index + 1)) + ") " + self.subTitles[paso][0][index] + "\n"
+            if index != 2: # El ultimo componente solo tiene un subtitulo
+               for i in range(len(key)):
+                  if key[i] == '1':
+                     prompt += self.whitespace * 2
+                     prompt += self.prompt[paso][0][index][i] + "\n"
+      return prompt   
+   
+   def obtainComponentHandler(self, key, paso):
+      if paso == 0 or paso == 1:
+         return self.obtainComponent(key[0], paso)  
+      if paso == 2 or paso == 3:
+         prompt = ""
+         for i in range(len(key)):
+            prompt += self.obtainComponent(key[i][0], paso, i)
+         return prompt
+      if paso == 4:
+         prompt = ""
+         for i in range(len(key[0])):
+            prompt += self.obtainComponent(key[0][i][0], paso, i)
+         return prompt
+      
+      raise ValueError("El paso no existe")
    
    def verifyKeys(self, keys):
       if len(keys) != len(self.prompt):
