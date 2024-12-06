@@ -1,5 +1,5 @@
 from google.cloud import bigquery
-from src.config.proyectos_names import ProyectosNames
+from src.config.proyectos_names import ProyectosNames, SubProyectosNames
 from google.oauth2 import service_account
 import json
 from google.cloud import bigquery
@@ -54,6 +54,96 @@ def query_selector(client):
         query = """ TODO """
     elif client == 'LAFISE PN':
         query = """ TODO"""
+    elif client == ProyectosNames.ALIGE_ALLIANZ_AHORRO.value:
+        query = f"""SELECT 
+                    fecha as Fecha,
+                    nombre_campana as Campania,
+                    plataforma as Plataforma,
+                    SUM(costo_total) AS inversion,
+                    SUM(lead_total_calificado) AS evento_objetivo,
+                    SUM(usuarios_totales) AS evento_inicial,
+                    CASE 
+                        WHEN SUM(lead_total_calificado) = 0 OR SUM(usuarios_totales) = 0 THEN 0
+                        ELSE SUM(lead_total_calificado) / SUM(usuarios_totales) 
+                    END AS cvr 
+                    FROM (
+                    SELECT 
+                        fecha,
+                        nombre_campana,
+                        (SELECT `dimensiones.Data_Cruda.codigo_plataforma`(SPLIT(nombre_campana, '_')[OFFSET(3)])) AS plataforma,
+                        costo_total,
+                        (Rango25_29 + Rango30_35 + Rango36_40 + Rango41_45) as lead_total_calificado,
+                        usuarios_totales
+                    FROM `alige-boomit.Dashboard.tabla_final_std`
+                    WHERE nombre_campana LIKE '%BOOMIT%'
+                        AND fecha >= (DATE_ADD(CURRENT_DATE(), INTERVAL -15 DAY)) 
+                        AND (SELECT `dimensiones.Data_Cruda.codigo_estrategia`(SPLIT(nombre_campana, '_')[OFFSET(4)])) 
+                            IN UNNEST(['PERFORMANCE', 'PURCHASE', 'TRAFICO', 'ADQUISICION', 'RETENCION', 
+                            'RECOMPRADORES', 'RETENCION Y RECOMPRADORES', 'CAPTACION', 'RETARGETING'])
+                        AND flag_producto = '{SubProyectosNames.ALIGE_ALLIANZ_AHORRO.value}'
+                    ) 
+                    GROUP BY fecha, nombre_campana, plataforma
+                    HAVING SUM(costo_total) > 0"""
+    elif client == ProyectosNames.ALIGE_ALLIANZ_VIDA.value:
+        query = f"""SELECT 
+                    fecha as Fecha,
+                    nombre_campana as Campania,
+                    plataforma as Plataforma,
+                    SUM(costo_total) AS inversion,
+                    SUM(lead_total_calificado) AS evento_objetivo,
+                    SUM(usuarios_totales) AS evento_inicial,
+                    CASE 
+                        WHEN SUM(lead_total_calificado) = 0 OR SUM(usuarios_totales) = 0 THEN 0
+                        ELSE SUM(lead_total_calificado) / SUM(usuarios_totales) 
+                    END AS cvr 
+                    FROM (
+                    SELECT 
+                        fecha,
+                        nombre_campana,
+                        (SELECT `dimensiones.Data_Cruda.codigo_plataforma`(SPLIT(nombre_campana, '_')[OFFSET(3)])) AS plataforma,
+                        costo_total,
+                        (Rango25_29 + Rango30_35 + Rango36_40 + Rango41_45) as lead_total_calificado,
+                        usuarios_totales
+                    FROM `alige-boomit.Dashboard.tabla_final_std`
+                    WHERE nombre_campana LIKE '%BOOMIT%'
+                        AND fecha >= (DATE_ADD(CURRENT_DATE(), INTERVAL -15 DAY)) 
+                        AND (SELECT `dimensiones.Data_Cruda.codigo_estrategia`(SPLIT(nombre_campana, '_')[OFFSET(4)])) 
+                            IN UNNEST(['PERFORMANCE', 'PURCHASE', 'TRAFICO', 'ADQUISICION', 'RETENCION', 
+                            'RECOMPRADORES', 'RETENCION Y RECOMPRADORES', 'CAPTACION', 'RETARGETING'])
+                        AND flag_producto = '{SubProyectosNames.ALIGE_ALLIANZ_VIDA.value}'
+                    ) 
+                    GROUP BY fecha, nombre_campana, plataforma
+                    HAVING SUM(costo_total) > 0"""
+    elif client == ProyectosNames.ALIGE_SKANDIA_AHORRO.value:
+        query = f"""SELECT 
+                    fecha as Fecha,
+                    nombre_campana as Campania,
+                    plataforma as Plataforma,
+                    SUM(costo_total) AS inversion,
+                    SUM(lead_total_calificado) AS evento_objetivo,
+                    SUM(usuarios_totales) AS evento_inicial,
+                    CASE 
+                        WHEN SUM(lead_total_calificado) = 0 OR SUM(usuarios_totales) = 0 THEN 0
+                        ELSE SUM(lead_total_calificado) / SUM(usuarios_totales) 
+                    END AS cvr 
+                    FROM (
+                    SELECT 
+                        fecha,
+                        nombre_campana,
+                        (SELECT `dimensiones.Data_Cruda.codigo_plataforma`(SPLIT(nombre_campana, '_')[OFFSET(3)])) AS plataforma,
+                        costo_total,
+                        (Rango25_29 + Rango30_35 + Rango36_40 + Rango41_45) as lead_total_calificado,
+                        usuarios_totales
+                    FROM `alige-boomit.Dashboard.tabla_final_std`
+                    WHERE nombre_campana LIKE '%BOOMIT%'
+                        AND fecha >= (DATE_ADD(CURRENT_DATE(), INTERVAL -15 DAY)) 
+                        AND (SELECT `dimensiones.Data_Cruda.codigo_estrategia`(SPLIT(nombre_campana, '_')[OFFSET(4)])) 
+                            IN UNNEST(['PERFORMANCE', 'PURCHASE', 'TRAFICO', 'ADQUISICION', 'RETENCION', 
+                            'RECOMPRADORES', 'RETENCION Y RECOMPRADORES', 'CAPTACION', 'RETARGETING'])
+                        AND flag_producto = '{SubProyectosNames.ALIGE_SKANDIA_AHORRO.value}'
+                    ) 
+                    GROUP BY fecha, nombre_campana, plataforma
+                    HAVING SUM(costo_total) > 0"""
     if query is None:
         raise ValueError(f"Client '{client}' is not recognized.")
     
