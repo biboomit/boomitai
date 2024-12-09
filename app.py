@@ -193,8 +193,6 @@ if show_client_dropdown:
                     text_box.empty()
                     qn_btn.empty()
                     
-                    print(question)
-    
                     if moderation_endpoint(question):
                         st.warning("Your question has been flagged. Refresh page to try again.")
                         st.stop()
