@@ -185,7 +185,7 @@ if show_client_dropdown:
                     st.caption('Procesando.Aguarde por favor...')
                     my_bar=st.progress(0)
                     for pct_complete in range(100):
-                        time.sleep(0.5)
+                        time.sleep(0.05)
                         my_bar.progress(pct_complete)
 
                     #question = prompts_abreviados[titulo_abreviado]  # Utiliza el prompt completo asociado al título abreviado
