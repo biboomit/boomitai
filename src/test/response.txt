@@ -2,14 +2,11 @@ Analiza los costos diarios de un conjunto de datos publicitarios a nivel de plat
 Identifica atentamente la fecha más reciente respecto a hoy (tendría que ser la fecha de ayer. Por ejemplo, si hoy es 16 de julio, la fecha máxima tendría que ser 15 de julio.) y realiza todo el análisis comparando los datos de los últimos 7 días con los datos de los 7 días inmediatamente anteriores. Si no hay datos de la fecha de ayer, realiza todas las comparaciones tomando la última fecha que haya como ayer.
 Sigue estas instrucciones:
 
-1. Exclusión de datos:
-        - Excluye los medios sin inversión o con inversión prácticamente nula (0 o cercana a 0).
-        - Excluye los medios con 0 eventos_objetivo del análisis.
 
-2. Plataformas a analizar:
+1. Plataformas a analizar:
         - Incluye todas las plataformas presentes en los datos. Por ejemplo, TikTok, Google, Meta/Facebook, etc.
 
-3. Análisis por plataforma: 
+2. Análisis por plataforma: 
    - Para cada plataforma, calcula y reporta para ambos períodos de 7 días:
     - Calculos para el periodo anterior (especificar fechas):
         a) Costo medio por evento_objetivo = (Suma total de inversión del período) / (Suma total de eventos_objetivo del período)
@@ -23,7 +20,7 @@ Sigue estas instrucciones:
         c) Define si el cambio es significativo (>15% de variación) o moderado (5-15% de variación)
         d) Calcula el porcentaje de variación de la inversión total entre períodos
 
-4. Puntos de interés a destacar:
+3. Puntos de interés a destacar:
     - Para cada plataforma, analiza y reporta:
         a) La variación porcentual del costo medio entre períodos
         b) La magnitud del cambio (significativo, moderado o estable)
@@ -33,7 +30,7 @@ Sigue estas instrucciones:
         b) 'TikTok mostró un aumento moderado del 8% en el costo medio, mientras que su inversión aumentó un 15%'
         c) 'Google mantuvo costos estables con una variación de solo 2%, con una inversión similar en ambos períodos'
 
-5. Formato de respuesta: 
+4. Formato de respuesta: 
     Estructura tu respuesta de la siguiente manera:
     a) Resumen general:
         - Especificar el rango total de fechas analizadas

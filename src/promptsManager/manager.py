@@ -1,4 +1,3 @@
-from promptsManager.propmtBase import prompts
 from ..config.proyectos_names import ProyectosNames, SubProyectosNames
 
 class Manager():

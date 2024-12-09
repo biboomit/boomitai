@@ -6,6 +6,7 @@ class Prompt1:
 Identifica atentamente la fecha más reciente respecto a hoy (tendría que ser la fecha de ayer. Por ejemplo, si hoy es 16 de julio, la fecha máxima tendría que ser 15 de julio.) y realiza todo el análisis comparando los datos de los últimos 7 días con los datos de los 7 días inmediatamente anteriores. Si no hay datos de la fecha de ayer, realiza todas las comparaciones tomando la última fecha que haya como ayer.
 Sigue estas instrucciones:
 """
+      self.index = 0
       
       # DO      
       self.prompt = [
@@ -140,7 +141,7 @@ Se recomienda continuar monitoreando las estrategias de inversión en Meta y Goo
       example = ""
       prompt = self.descripcion + "\n"
       for i in range(len(keys)):
-         prompt += (i+1).__str__() + ". " + self.titles[i] + "\n"
+         prompt += self.obtainTitle(i, keys[i])
          prompt += self.obtainComponentHandler(keys[i], i) + "\n"
       
       example += self.obtainExample(keys[i], i) + "\n"
@@ -217,3 +218,18 @@ Se recomienda continuar monitoreando las estrategias de inversión en Meta y Goo
       if paso in [2, 3, 4]:
          return True
       else: False
+      
+   def obtainTitle(self, paso, key):
+      if self.containsOne(key):
+         self.index += 1
+         return (self.index).__str__() + ". " + self.titles[paso] + "\n"
+      return ""
+   
+   def containsOne(self, key):
+      for elemento in key:
+         if isinstance(elemento, list):
+            if self.containsOne(elemento):
+               return True
+         elif "1" in elemento:
+            return True
+      return False

@@ -19,6 +19,7 @@ from utils import (
     retrieve_assistant_created_files,
 )
 from src.promptsManager.propmtBase import prompts
+from src.promptsManager.manager import Manager
 from src.config.proyectos_names import ProyectosNames
 
  
@@ -172,7 +173,7 @@ if show_client_dropdown:
             prompts_abreviados = prompts
     
             # Selección de prompt abreviado
-            titulo_abreviado = st.selectbox("Seleccione un prompt:", list(prompts_abreviados.keys()))
+            titulo_abreviado = st.selectbox("Seleccione un prompt:", list(prompts_abreviados.keys())) # key del prompt
             text_box = st.empty()
             qn_btn = st.empty()
     
@@ -187,9 +188,12 @@ if show_client_dropdown:
                         time.sleep(0.5)
                         my_bar.progress(pct_complete)
 
-                    question = prompts_abreviados[titulo_abreviado]  # Utiliza el prompt completo asociado al título abreviado
+                    #question = prompts_abreviados[titulo_abreviado]  # Utiliza el prompt completo asociado al título abreviado
+                    question = Manager().obtenerPrompt(cliente_seleccionado, titulo_abreviado)
                     text_box.empty()
                     qn_btn.empty()
+                    
+                    print(question)
     
                     if moderation_endpoint(question):
                         st.warning("Your question has been flagged. Refresh page to try again.")

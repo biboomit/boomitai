@@ -16,9 +16,9 @@ prompt = Prompt1()
 # Los subtitulos se imprimen cuando se detecta que se quiere imprimir una linea del componente.
 
 
-res = prompt.createPrompt([["11"], ["1"], [["11"], ["11"], ["1111"]], [["111"],["111"]], [[["111"], ["1111"], ["1"]]]])
+#res = prompt.createPrompt([["11"], ["1"], [["11"], ["11"], ["1111"]], [["111"],["111"]], [[["111"], ["1111"], ["1"]]]])
 
-# res = prompt.createPrompt([["01"], ["1"], [["10"], ["10"], ["1000"]], [["100"]], [[["110"], ["000"], ["1"]]]])
+res = prompt.createPrompt([[""],["1"], [["11"], ["11"], ["1111"]], [["111"],["111"]], [[["111"], ["1111"], ["1"]]]])
 
 ruta = "src/test/response.txt"
 
