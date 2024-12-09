@@ -18,8 +18,8 @@ def upload_file(file_content, file_name):
         "file": (file_name, contenido_jsonl)
     }
     
-    with open("archivo.jsonl", "w") as json_file:
-        json_file.write(contenido_jsonl)
+    # with open("archivo.jsonl", "w") as json_file:
+    #     json_file.write(contenido_jsonl)
     
     # raise Exception("archivo.jsonl creado")
     
