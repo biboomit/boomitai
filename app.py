@@ -146,7 +146,7 @@ if show_client_dropdown:
             st.session_state.gbq_data['inversion'] = pd.to_numeric(st.session_state.gbq_data['inversion'], errors='coerce')
 
             # Checkbox para mostrar preview del DataFrame
-            if st.checkbox("Mostrar preview de los datos"):
+            if st.checkbox("Mostrar preview de los datos", value=True):
                 # Display a sample of the data to verify it has been loaded correctly
                 st.write(st.session_state.gbq_data)
     
@@ -185,7 +185,7 @@ if show_client_dropdown:
                     st.caption('Procesando.Aguarde por favor...')
                     my_bar=st.progress(0)
                     for pct_complete in range(100):
-                        time.sleep(0.5)
+                        time.sleep(0.05)
                         my_bar.progress(pct_complete)
 
                     #question = prompts_abreviados[titulo_abreviado]  # Utiliza el prompt completo asociado al título abreviado
