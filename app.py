@@ -21,6 +21,8 @@ from utils import (
 from src.promptsManager.propmtBase import prompts
 from src.promptsManager.manager import Manager
 from src.config.proyectos_names import ProyectosNames
+from src.state.state_manager import StateManager
+from src.state.initializer import initialize_session_state
 
  
 warnings.filterwarnings("ignore")
@@ -45,40 +47,7 @@ st.markdown("Analítica de marketing inteligente", help="[Source]()")
 # Apply custom CSS
 render_custom_css()
  
-if "text_boxes" not in st.session_state:
-    st.session_state.text_boxes = []
- 
-# Initialise session state variables
-if "file_uploaded" not in st.session_state:
-    st.session_state.file_uploaded = False
- 
-if "show_text_input" not in st.session_state:
-    st.session_state.show_text_input = False
- 
-if "assistant_text" not in st.session_state:
-    st.session_state.assistant_text = [""]
- 
-if "code_input" not in st.session_state:
-    st.session_state.code_input = []
- 
-if "code_output" not in st.session_state:
-    st.session_state.code_output = []
- 
-if "disabled" not in st.session_state:
-    st.session_state.disabled = False
- 
-if "gbq_data" not in st.session_state:
-    st.session_state.gbq_data = None
-    
-if "file_id" not in st.session_state:
-    st.session_state.file_id = None
-
-if "files_to_delete" not in st.session_state:
-    st.session_state.files_to_delete = []
- 
-if "last_interaction" not in st.session_state:
-    st.session_state.last_interaction = datetime.now()
- 
+initialize_session_state() 
  
 clientes_por_equipo = {
     "equipo_verde": [ProyectosNames.ALIGE_ALLIANZ_AHORRO.value, ProyectosNames.ALIGE_ALLIANZ_VIDA.value, ProyectosNames.ALIGE_SKANDIA_AHORRO.value], # ["LAFISE PN", "LAFISE RD", "LAFISE HN", "ALIGE"],
@@ -153,7 +122,7 @@ if show_client_dropdown:
             st.write(f"Bienvenido al equipo {equipo_seleccionado.capitalize()}! Has seleccionado al cliente: {cliente_seleccionado}")
     
             # Get data from the database and store it in the session state
-            st.session_state.gbq_data = bbdd.get_data(cliente_seleccionado)
+            StateManager.update_state("gbq_data", bbdd.get_data(cliente_seleccionado))
             
             # Eliminar caracteres extraños como comillas dobles, barras invertidas, etc.
             st.session_state.gbq_data['inversion'] = st.session_state.gbq_data['inversion'].replace(r'[\"\\]', '', regex=True)
