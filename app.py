@@ -25,6 +25,8 @@ from src.config.proyectos_names import ProyectosNames
  
 warnings.filterwarnings("ignore")
 warnings.simplefilter(action='ignore', category=(SettingWithCopyWarning))
+
+print("Inicio del script")
  
 # Inicializa una variable de estado para controlar la visibilidad del cuadro de texto
 show_password_input = True  # Initially show password input
@@ -93,9 +95,12 @@ team_options.insert(0, placeholder_option)
  
 # Selection of team
 equipo_seleccionado = st.selectbox("Seleccione un equipo:", team_options, index=0, key="equipo_seleccionado")
+
+print("Equipos creados")
  
 # Check if the selected team is the placeholder
-if equipo_seleccionado == placeholder_option:
+while equipo_seleccionado == placeholder_option:
+    print("Placeholder seleccionado")
     # Set the selected team to None to indicate no selection
     equipo_seleccionado = None
  
@@ -110,18 +115,23 @@ team_passwords = {
 password_input_container = st.empty()  # Create the container initially
  
 if equipo_seleccionado:
+    print(f"Equipo seleccionado: {equipo_seleccionado}")
     if show_password_input:
         password_input = password_input_container.text_input("Ingrese la contraseña del equipo:", type="password")
         if password_input != "":
+            print(f"Contraseña ingresada")
             if password_input == team_passwords.get(equipo_seleccionado):
                 # st.success("Contraseña correcta!")
                 show_client_dropdown = True  # Show client dropdown
                 password_input_container.empty()  # Clear the container after successful login
+                print("Contraseña correcta")
             else:
                 st.error("Contraseña incorrecta. Intente nuevamente.")
+                print("Contraseña incorrecta")
  
 # Display client dropdown only if password is correct
 if show_client_dropdown:
+    print("Cliente iniciado")
     # Password validated, display client dropdown
     clientes = clientes_por_equipo.get(equipo_seleccionado, [])
     if clientes:
@@ -131,10 +141,14 @@ if show_client_dropdown:
         
         cliente_seleccionado = st.selectbox("Selecciona un cliente:", clientes, index=0, key="cliente_seleccionado")
         
+        print(f"Cliente seleccionado: {cliente_seleccionado}")
+        
         if cliente_seleccionado == placeholder_option:
             cliente_seleccionado = None
             
         if cliente_seleccionado:    
+            
+            print(f"Cliente seleccionado 2: {cliente_seleccionado}")
         
             st.write(f"Bienvenido al equipo {equipo_seleccionado.capitalize()}! Has seleccionado al cliente: {cliente_seleccionado}")
     
@@ -159,15 +173,21 @@ if show_client_dropdown:
             timestamp = now.strftime("%Y%m%d%H%M%S")
             
             file_name = f"{cliente_seleccionado}_{timestamp}_csvEnJsonl.jsonl"
+            
+            print("Archivo creado")
 
             if not st.session_state.file_id:
                 file_info = upload_file(st.session_state.gbq_data.to_csv(index=False), file_name)
                 st.session_state.file_id = file_info["id"]
                 st.session_state.files_to_delete.append(st.session_state.file_id)
+                
+            print("Archivo subido")
 
             # Initialise the OpenAI client, and retrieve the assistant
             client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
             assistant = client.beta.assistants.retrieve(st.secrets["ASSISTANT_ID_2"])
+            
+            print("Cliente y asistente inicializados")
             
             # Define una lista de prompts predefinidos
             prompts_abreviados = prompts
@@ -182,6 +202,7 @@ if show_client_dropdown:
             col1, col2 = st.columns([6, 1])
             with col1:
                 if st.button("Preguntar a Boomit AI"):
+                    print("Preguntando a Boomit AI")
                     st.caption('Procesando.Aguarde por favor...')
                     my_bar=st.progress(0)
                     for pct_complete in range(100):
@@ -218,6 +239,8 @@ if show_client_dropdown:
                             }
                         ]
                     )
+                    
+                    print("Todo pronto para enviar la pregunta")
     
                     with client.beta.threads.runs.stream(thread_id=st.session_state.thread_id,
                                                         assistant_id=assistant.id,
@@ -228,6 +251,8 @@ if show_client_dropdown:
                         st.toast("BOOMIT AI ha terminado su análisis", icon="🕵️")
                     # Oculta la barra de progreso cuando finaliza
                     my_bar.empty()    
+                    
+                    print("Respuesta recivida")
     
                     # Asegúrate de que `text_boxes` no esté vacío antes de intentar acceder a sus elementos
                     if st.session_state.text_boxes:
@@ -263,7 +288,8 @@ if show_client_dropdown:
     
             # Close the container div
             st.markdown('</div>', unsafe_allow_html=True)
-    
+        print("Cliente seleccionado 3: ", cliente_seleccionado)
+print("Fin del if 'show_client_dropdown'")
 # Mostrar cuadro de texto para realizar otra consulta solo si se generó un output previo
 if st.session_state.show_text_input:
     consulta_libre = st.text_area("Realice otra consulta:", "")
@@ -307,7 +333,7 @@ if st.session_state.show_text_input:
                 st.session_state.assistant_created_file_ids = retrieve_assistant_created_files(assistant_messages)
                 # Download these files
                 st.session_state.download_files, st.session_state.download_file_names = render_download_files(st.session_state.assistant_created_file_ids)
- 
+print("Fin del if 'show_text_input'")
 # Check for inactivity
 inactive_time_limit = timedelta(minutes=10)
 if datetime.now() - st.session_state.last_interaction > inactive_time_limit:
@@ -329,5 +355,5 @@ def cleanup():
 import atexit
 atexit.register(cleanup)
  
- 
+print("Fin del script")
  
