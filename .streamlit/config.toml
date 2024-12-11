@@ -1,5 +1,5 @@
 [server]
 maxUploadSize = 20
 enableStaticServing = true
-
+websocket_timeout = 600
 
