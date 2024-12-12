@@ -81,7 +81,8 @@ if "last_interaction" not in st.session_state:
 clientes_por_equipo = {
     "equipo_verde": [ProyectosNames.ALIGE_ALLIANZ_AHORRO.value, ProyectosNames.ALIGE_ALLIANZ_VIDA.value, ProyectosNames.ALIGE_SKANDIA_AHORRO.value], # ["LAFISE PN", "LAFISE RD", "LAFISE HN", "ALIGE"],
     "equipo_amarillo": [ProyectosNames.PEIGO.value], # ["PEIGO", "KASH", "DLOCALGO", "BANPAIS"],
-    "equipo_violeta": [ProyectosNames.THEYARD.value] # ["BOOMIT", "THEYARD"]
+    "equipo_violeta": [ProyectosNames.THEYARD.value], # ["BOOMIT", "THEYARD"]
+    "Demo Boomit": [ProyectosNames.DEMO.value]
 }
  
 # Define a placeholder option
@@ -103,7 +104,8 @@ if equipo_seleccionado == placeholder_option:
 team_passwords = {
     "equipo_verde": "verde",
     "equipo_amarillo": "amarillo",
-    "equipo_violeta": "violeta"
+    "equipo_violeta": "violeta",
+    "Demo Boomit": "demo"
 }
  
 # Password input and validation

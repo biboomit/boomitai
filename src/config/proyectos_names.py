@@ -6,6 +6,7 @@ class ProyectosNames(Enum):
     ALIGE_ALLIANZ_AHORRO = 'ALIGE ALLIANZ AHORRO'
     ALIGE_ALLIANZ_VIDA = 'ALIGE ALLIANZ VIDA'
     ALIGE_SKANDIA_AHORRO = 'ALIGE SKANDIA AHORRO'
+    DEMO = 'Demo Boomit'
     
 class SubProyectosNames(Enum):
     ALIGE_ALLIANZ_AHORRO = 'Allianz ahorro'

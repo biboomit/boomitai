@@ -19,8 +19,12 @@ class Manager():
         elif client == ProyectosNames.ALIGE_SKANDIA_AHORRO.value:
             from ..clientManager.alige.alige_skandia_ahorro import AligeSkandiaAhorro
             return AligeSkandiaAhorro()
+        elif client == ProyectosNames.DEMO.value:
+            from ..clientManager.peigo import Peigo
+            return Peigo()
         else:
             return None
+        
         
         
             
