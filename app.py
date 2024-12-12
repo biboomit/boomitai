@@ -125,8 +125,10 @@ if show_client_dropdown:
             StateManager.update_state("gbq_data", bbdd.get_data(cliente_seleccionado))
             
             # Eliminar caracteres extraños como comillas dobles, barras invertidas, etc.
-            st.session_state.gbq_data['inversion'] = st.session_state.gbq_data['inversion'].replace(r'[\"\\]', '', regex=True)
-            st.session_state.gbq_data['inversion'] = pd.to_numeric(st.session_state.gbq_data['inversion'], errors='coerce')
+            gbq_data = StateManager.get_state("gbq_data")
+            gbq_data['inversion'] = gbq_data['inversion'].replace(r'[\"\\]', '', regex=True)
+            gbq_data['inversion'] = pd.to_numeric(gbq_data['inversion'], errors='coerce')
+            StateManager.update_state("gbq_data", gbq_data)
 
             # Checkbox para mostrar preview del DataFrame
             if st.checkbox("Mostrar preview de los datos", value=True):
@@ -145,12 +147,16 @@ if show_client_dropdown:
             
             print("Archivo creado")
 
-            if not st.session_state.file_id:
-                file_info = upload_file(st.session_state.gbq_data.to_csv(index=False), file_name)
-                st.session_state.file_id = file_info["id"]
-                st.session_state.files_to_delete.append(st.session_state.file_id)
+            if not StateManager.get_state("file_id"):
+                file_info = upload_file(StateManager.get_state("gbq_data").to_csv(index=False), file_name)
+                StateManager.bulk_update({
+                    "file_id": file_info["id"],
+                    "files_to_delete": StateManager.get_state("files_to_delete", []) + [file_info["id"]]
+                })
+                print("Archivo subido")
                 
-            print("Archivo subido")
+                
+            print("Archivo ya subido")
 
             # Initialise the OpenAI client, and retrieve the assistant
             client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
@@ -188,25 +194,20 @@ if show_client_dropdown:
                         st.stop()
     
                     # Create a new thread
-                    if "thread_id" not in st.session_state:
+                    if not StateManager.get_state("thread_id"):
                         thread = client.beta.threads.create()
-                        st.session_state.thread_id = thread.id
+                        StateManager.update_state("thread_id", thread.id)
     
                     # Update the thread to attach the file
                     client.beta.threads.update(
-                        thread_id=st.session_state.thread_id,
-                        tool_resources={"code_interpreter": {"file_ids": [st.session_state.file_id]}}
+                        thread_id=StateManager.get_state("thread_id"),
+                        tool_resources={"code_interpreter": {"file_ids": [StateManager.get_state("file_id")]}}
                     )
-                    
+
                     client.beta.threads.messages.create(
-                        thread_id=st.session_state.thread_id,
+                        thread_id=StateManager.get_state("thread_id"),
                         role="user",
-                        content=[
-                            {
-                                "type": "text",
-                                "text": question  
-                            }
-                        ]
+                        content=[{"type": "text", "text": question}]
                     )
                     
                     print("Todo pronto para enviar la pregunta")
@@ -224,8 +225,9 @@ if show_client_dropdown:
                     print("Respuesta recivida")
     
                     # Asegúrate de que `text_boxes` no esté vacío antes de intentar acceder a sus elementos
-                    if st.session_state.text_boxes:
-                        st.session_state.assistant_text[0] = st.session_state.text_boxes[-1]
+                    text_boxes = StateManager.get_state("text_boxes", [])
+                    if text_boxes:
+                        StateManager.update_state("assistant_text", [text_boxes[-1]])
                     else:
                         st.error("No hay respuestas disponibles del asistente.")
     
@@ -237,9 +239,13 @@ if show_client_dropdown:
                         # Retrieve the messages by the Assistant from the thread
                         assistant_messages = retrieve_messages_from_thread(st.session_state.thread_id)
                         # For each assistant message, retrieve the file(s) created by the Assistant
-                        st.session_state.assistant_created_file_ids = retrieve_assistant_created_files(assistant_messages)
-                        # Download these files
-                        st.session_state.download_files, st.session_state.download_file_names = render_download_files(st.session_state.assistant_created_file_ids)
+                        assistant_created_file_ids = retrieve_assistant_created_files(assistant_messages)
+                        download_files, download_file_names = render_download_files(assistant_created_file_ids)
+                        StateManager.bulk_update({
+                            "assistant_created_file_ids": assistant_created_file_ids,
+                            "download_files": download_files,
+                            "download_file_names": download_file_names
+                        })
     
                     # Clean-up
                     # Delete the file(s) created by the Assistant
@@ -305,20 +311,26 @@ if st.session_state.show_text_input:
 print("Fin del if 'show_text_input'")
 # Check for inactivity
 inactive_time_limit = timedelta(minutes=10)
-if datetime.now() - st.session_state.last_interaction > inactive_time_limit:
-    if st.session_state.files_to_delete:
-        delete_files(st.session_state.files_to_delete)
+last_interaction = StateManager.get_state("last_interaction")
+if datetime.now() - last_interaction > inactive_time_limit:
+    files_to_delete = StateManager.get_state("files_to_delete", [])
+    if files_to_delete:
+        delete_files(files_to_delete)
         st.success("Sesión inactiva. Archivos eliminados correctamente.")
-        st.session_state.files_to_delete = []
+        StateManager.update_state("files_to_delete", [])
+
+# Upate last interaction time
+StateManager.update_state("last_interaction", datetime.now())
  
 # Update last interaction time
 st.session_state.last_interaction = datetime.now()
  
 # Optionally, add a cleanup at the end of the script
 def cleanup():
-    if st.session_state.files_to_delete:
-        delete_files(st.session_state.files_to_delete)
-        st.session_state.files_to_delete = []
+    files_to_delete = StateManager.get_state("files_to_delete", [])
+    if files_to_delete:
+        delete_files(files_to_delete)
+        StateManager.update_state("files_to_delete", [])
  
 # Register the cleanup function to run when the script exits
 import atexit
