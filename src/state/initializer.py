@@ -17,7 +17,11 @@ def initialize_session_state() -> None:
         "thread_id": None,
         "assistant_created_file_ids": [],
         "download_files": [],
-        "download_file_names": []
+        "download_file_names": [],
+        "conversation_history": [],
+        "current_response": None,    
+        "response_artifacts": [],    
+        "response_metadata": {} 
     }
     
     for var, default_value in state_variables.items():

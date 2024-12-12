@@ -471,3 +471,29 @@ class EventHandler(AssistantEventHandler):
     #     """
     #     st.error(f"An error occurred: {exception}")
     #     st.stop()
+    
+def retrieve_message_content(message_id: str, thread_id: str, client: OpenAI) -> str:
+    """
+    Retrieves the content of a specific message from an OpenAI thread.
+    
+    Args:
+        message_id (str): The ID of the message to retrieve
+        thread_id (str): The ID of the thread containing the message
+        client (OpenAI): Initialized OpenAI client instance
+    
+    Returns:
+        str: The text content of the message
+    """
+    message = client.beta.threads.messages.retrieve(
+        message_id=message_id,
+        thread_id=thread_id
+    )
+    
+    # Extract text content from the message
+    # Messages can have multiple content parts, we aggregate all text content
+    content_parts = []
+    for content in message.content:
+        if content.type == 'text':
+            content_parts.append(content.text.value)
+    
+    return '\n'.join(content_parts)

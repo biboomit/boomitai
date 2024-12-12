@@ -15,6 +15,7 @@ from utils import (
     moderation_endpoint,
     render_custom_css,
     render_download_files,
+    retrieve_message_content,
     retrieve_messages_from_thread,
     retrieve_assistant_created_files,
 )
@@ -24,6 +25,36 @@ from src.config.proyectos_names import ProyectosNames
 from src.state.state_manager import StateManager
 from src.state.initializer import initialize_session_state
 
+def render_conversation_history():
+    """
+    Unified conversation history renderer that interfaces directly with StateManager.
+    
+    This implementation follows the Dependency Inversion Principle by accessing the
+    conversation history through our established state management system.
+    """
+    conversation_history = StateManager.get_conversation_history()
+    if not conversation_history:
+        return
+        
+    st.subheader("Historial de Conversación")
+    for entry in reversed(conversation_history):  # Show newest first
+        with st.expander(f"Consulta: {entry['question'][:50]}...", expanded=False):
+            st.markdown("**Pregunta:**")
+            st.markdown(entry['question'])
+            st.markdown("**Respuesta:**")
+            st.markdown(entry['answer'])
+            
+            # Handle file downloads if present in metadata
+            if entry.get('metadata', {}).get('download_files'):
+                st.markdown("**Archivos generados:**")
+                for idx, file in enumerate(entry['metadata']['download_files']):
+                    file_name = entry['metadata']['download_file_names'][idx]
+                    st.download_button(
+                        label=f"Descargar {file_name}",
+                        data=file,
+                        file_name=file_name,
+                        key=f"download_{entry['metadata'].get('response_id', idx)}_{idx}"
+                    )
  
 warnings.filterwarnings("ignore")
 warnings.simplefilter(action='ignore', category=(SettingWithCopyWarning))
@@ -120,6 +151,8 @@ if show_client_dropdown:
             print(f"Cliente seleccionado 2: {cliente_seleccionado}")
         
             st.write(f"Bienvenido al equipo {equipo_seleccionado.capitalize()}! Has seleccionado al cliente: {cliente_seleccionado}")
+            
+            #render_conversation_history()
     
             # Get data from the database and store it in the session state
             StateManager.update_state("gbq_data", bbdd.get_data(cliente_seleccionado))
@@ -178,32 +211,34 @@ if show_client_dropdown:
             with col1:
                 if st.button("Preguntar a Boomit AI"):
                     print("Preguntando a Boomit AI")
-                    st.caption('Procesando.Aguarde por favor...')
-                    my_bar=st.progress(0)
+                    st.caption('Procesando. Aguarde por favor...')
+                    my_bar = st.progress(0)
                     for pct_complete in range(100):
                         time.sleep(0.05)
                         my_bar.progress(pct_complete)
 
-                    #question = prompts_abreviados[titulo_abreviado]  # Utiliza el prompt completo asociado al título abreviado
+                    # Initialize response parameters
                     question = Manager().obtenerPrompt(cliente_seleccionado, titulo_abreviado)
                     text_box.empty()
                     qn_btn.empty()
                     
+                    # Content moderation check
                     if moderation_endpoint(question):
                         st.warning("Your question has been flagged. Refresh page to try again.")
                         st.stop()
-    
-                    # Create a new thread
+
+                    # Thread initialization and management
                     if not StateManager.get_state("thread_id"):
                         thread = client.beta.threads.create()
                         StateManager.update_state("thread_id", thread.id)
-    
-                    # Update the thread to attach the file
+
+                    # Configure thread with file resources
                     client.beta.threads.update(
                         thread_id=StateManager.get_state("thread_id"),
                         tool_resources={"code_interpreter": {"file_ids": [StateManager.get_state("file_id")]}}
                     )
 
+                    # Create message in thread
                     client.beta.threads.messages.create(
                         thread_id=StateManager.get_state("thread_id"),
                         role="user",
@@ -211,48 +246,68 @@ if show_client_dropdown:
                     )
                     
                     print("Todo pronto para enviar la pregunta")
-    
-                    with client.beta.threads.runs.stream(thread_id=st.session_state.thread_id,
-                                                        assistant_id=assistant.id,
-                                                        tool_choice={"type": "code_interpreter"},
-                                                        event_handler=EventHandler(),
-                                                        temperature=0.3) as stream:
+
+                    # Stream processing with progress indication
+                    with client.beta.threads.runs.stream(
+                        thread_id=st.session_state.thread_id,
+                        assistant_id=assistant.id,
+                        tool_choice={"type": "code_interpreter"},
+                        event_handler=EventHandler(),
+                        temperature=0.3
+                    ) as stream:
                         stream.until_done()
                         st.toast("BOOMIT AI ha terminado su análisis", icon="🕵️")
-                    # Oculta la barra de progreso cuando finaliza
-                    my_bar.empty()    
                     
-                    print("Respuesta recivida")
-    
-                    # Asegúrate de que `text_boxes` no esté vacío antes de intentar acceder a sus elementos
-                    text_boxes = StateManager.get_state("text_boxes", [])
-                    if text_boxes:
-                        StateManager.update_state("assistant_text", [text_boxes[-1]])
-                    else:
-                        st.error("No hay respuestas disponibles del asistente.")
-    
-                    # Save the assistant's response
-                    st.session_state.assistant_text[0] = st.session_state.text_boxes[-1]
-    
-                    # Prepare the files for download
-                    with st.spinner("Preparing the files for download..."):
-                        # Retrieve the messages by the Assistant from the thread
-                        assistant_messages = retrieve_messages_from_thread(st.session_state.thread_id)
-                        # For each assistant message, retrieve the file(s) created by the Assistant
-                        assistant_created_file_ids = retrieve_assistant_created_files(assistant_messages)
-                        download_files, download_file_names = render_download_files(assistant_created_file_ids)
-                        StateManager.bulk_update({
-                            "assistant_created_file_ids": assistant_created_file_ids,
-                            "download_files": download_files,
-                            "download_file_names": download_file_names
-                        })
-    
-                    # Clean-up
-                    # Delete the file(s) created by the Assistant
-                    delete_files(st.session_state.assistant_created_file_ids)
-    
-                    # Set show_text_input to True to show the text input for another query
-                    st.session_state.show_text_input = True
+                    my_bar.empty()
+                    print("Respuesta recibida")
+
+                    # Response processing and state management
+                    assistant_messages = retrieve_messages_from_thread(st.session_state.thread_id)
+                    if assistant_messages:
+                        message_content = retrieve_message_content(
+                            message_id=assistant_messages[-1],
+                            thread_id=st.session_state.thread_id,
+                            client=client
+                        )
+                        
+                        metadata = {
+                            "thread_id": StateManager.get_state("thread_id"),
+                            "file_ids": StateManager.get_state("assistant_created_file_ids", []),
+                            "download_files": StateManager.get_state("download_files", []),
+                            "download_file_names": StateManager.get_state("download_file_names", [])
+                        }
+                        
+                        StateManager.add_conversation_entry(
+                            question=question,
+                            answer=message_content,
+                            artifacts=StateManager.get_state("assistant_created_file_ids", []),
+                            metadata=metadata
+                        )
+                        
+                        # Corrected state update
+                        StateManager.update_state("assistant_text", [message_content])
+                        
+                        # Re-render conversation history to show the new entry
+                        #render_conversation_history()
+
+                        # Handle file preparation for download
+                        with st.spinner("Preparing the files for download..."):
+                            assistant_messages = retrieve_messages_from_thread(st.session_state.thread_id)
+                            assistant_created_file_ids = retrieve_assistant_created_files(assistant_messages)
+                            download_files, download_file_names = render_download_files(assistant_created_file_ids)
+                            
+                            # Bulk update state with file information
+                            StateManager.bulk_update({
+                                "assistant_created_file_ids": assistant_created_file_ids,
+                                "download_files": download_files,
+                                "download_file_names": download_file_names
+                            })
+
+                        # Cleanup temporary files
+                        delete_files(st.session_state.assistant_created_file_ids)
+
+                        # Enable text input for follow-up queries
+                        st.session_state.show_text_input = True
     
             with col2:
                 if st.button("Log Out", key="logout_button", help="Cerrar sesión y limpiar archivos"):
@@ -263,6 +318,7 @@ if show_client_dropdown:
     
             # Close the container div
             st.markdown('</div>', unsafe_allow_html=True)
+            render_conversation_history()
         print("Cliente seleccionado 3: ", cliente_seleccionado)
 print("Fin del if 'show_client_dropdown'")
 # Mostrar cuadro de texto para realizar otra consulta solo si se generó un output previo
