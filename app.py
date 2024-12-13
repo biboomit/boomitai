@@ -28,9 +28,6 @@ from src.state.initializer import initialize_session_state
 def render_conversation_history():
     """
     Unified conversation history renderer that interfaces directly with StateManager.
-    
-    This implementation follows the Dependency Inversion Principle by accessing the
-    conversation history through our established state management system.
     """
     conversation_history = StateManager.get_conversation_history()
     if not conversation_history:
@@ -152,8 +149,8 @@ if show_client_dropdown:
         
             st.write(f"Bienvenido al equipo {equipo_seleccionado.capitalize()}! Has seleccionado al cliente: {cliente_seleccionado}")
             
-            #render_conversation_history()
-    
+            render_conversation_history()
+            
             # Get data from the database and store it in the session state
             StateManager.update_state("gbq_data", bbdd.get_data(cliente_seleccionado))
             
@@ -278,19 +275,15 @@ if show_client_dropdown:
                         }
                         
                         StateManager.add_conversation_entry(
-                            question=question,
+                            question=titulo_abreviado,
                             answer=message_content,
                             artifacts=StateManager.get_state("assistant_created_file_ids", []),
                             metadata=metadata
                         )
                         
-                        # Corrected state update
                         StateManager.update_state("assistant_text", [message_content])
                         
-                        # Re-render conversation history to show the new entry
-                        #render_conversation_history()
-
-                        # Handle file preparation for download
+                            # Handle file preparation for download
                         with st.spinner("Preparing the files for download..."):
                             assistant_messages = retrieve_messages_from_thread(st.session_state.thread_id)
                             assistant_created_file_ids = retrieve_assistant_created_files(assistant_messages)
@@ -318,7 +311,6 @@ if show_client_dropdown:
     
             # Close the container div
             st.markdown('</div>', unsafe_allow_html=True)
-            render_conversation_history()
         print("Cliente seleccionado 3: ", cliente_seleccionado)
 print("Fin del if 'show_client_dropdown'")
 # Mostrar cuadro de texto para realizar otra consulta solo si se generó un output previo
@@ -364,6 +356,49 @@ if st.session_state.show_text_input:
                 st.session_state.assistant_created_file_ids = retrieve_assistant_created_files(assistant_messages)
                 # Download these files
                 st.session_state.download_files, st.session_state.download_file_names = render_download_files(st.session_state.assistant_created_file_ids)
+                
+            # Response processing and state management
+            assistant_messages = retrieve_messages_from_thread(st.session_state.thread_id)
+            if assistant_messages:
+                message_content = retrieve_message_content(
+                    message_id=assistant_messages[-1],
+                    thread_id=st.session_state.thread_id,
+                    client=client
+                )
+
+                # Prepare files for download
+                with st.spinner("Preparing the files for download..."):
+                    assistant_created_file_ids = retrieve_assistant_created_files(assistant_messages)
+                    download_files, download_file_names = render_download_files(assistant_created_file_ids)
+
+                    # Update state with file information
+                    StateManager.bulk_update({
+                        "assistant_created_file_ids": assistant_created_file_ids,
+                        "download_files": download_files,
+                        "download_file_names": download_file_names
+                    })
+
+                # Create metadata for conversation entry
+                metadata = {
+                    "thread_id": StateManager.get_state("thread_id"),
+                    "file_ids": assistant_created_file_ids,
+                    "download_files": download_files,
+                    "download_file_names": download_file_names
+                }
+
+                # Add conversation entry
+                StateManager.add_conversation_entry(
+                    question=consulta_libre,  # Use the actual free-form question
+                    answer=message_content,
+                    artifacts=assistant_created_file_ids,
+                    metadata=metadata
+                )
+
+                StateManager.update_state("assistant_text", [message_content])
+
+                # Cleanup files
+                delete_files(assistant_created_file_ids)
+                
 print("Fin del if 'show_text_input'")
 # Check for inactivity
 inactive_time_limit = timedelta(minutes=10)
