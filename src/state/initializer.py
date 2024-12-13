@@ -15,6 +15,8 @@ def initialize_session_state() -> None:
         "files_to_delete": [],
         "last_interaction": datetime.now(),
         "thread_id": None,
+        "assistant_id": None,
+        "client": None,
         "assistant_created_file_ids": [],
         "download_files": [],
         "download_file_names": [],

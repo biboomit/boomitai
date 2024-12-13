@@ -192,7 +192,9 @@ if show_client_dropdown:
 
             # Initialise the OpenAI client, and retrieve the assistant
             client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
+            StateManager.update_state("client", client)
             assistant = client.beta.assistants.retrieve(st.secrets["ASSISTANT_ID_2"])
+            StateManager.update_state("assistant_id", assistant.id)
             
             print("Cliente y asistente inicializados")
             
@@ -323,6 +325,8 @@ if st.session_state.show_text_input:
             question = consulta_libre
             text_box.empty()
             qn_btn.empty()
+            
+            client = StateManager.get_state("client")
  
             # Crear un nuevo hilo (thread) si no existe uno
             if "thread_id" not in st.session_state:
@@ -343,7 +347,7 @@ if st.session_state.show_text_input:
             #st.session_state.text_boxes[-1].success(f"**> 🤔 User:** {question}")
  
             with client.beta.threads.runs.stream(thread_id=st.session_state.thread_id,
-                                                 assistant_id=assistant.id,
+                                                 assistant_id=StateManager.get_state("assistant_id"),
                                                  tool_choice={"type": "code_interpreter"},
                                                  event_handler=EventHandler(),
                                                  temperature=0) as stream:
