@@ -1,6 +1,7 @@
 """
 utils.py
 """
+from datetime import datetime
 import os
 import base64
 import hmac
@@ -312,7 +313,23 @@ def render_download_files(file_id_list: list[str]) -> Tuple[list[bytes], list[st
                                     mime="text/csv")
     
     return downloaded_files, file_names
-    
+
+def is_thread_ready(thread_id: str, client: OpenAI) -> bool:
+    """
+    Verifica si el hilo está listo para aceptar nuevas consultas.
+
+    Args:
+        thread_id (str): El ID del hilo.
+        client (OpenAI): Cliente OpenAI inicializado.
+
+    Returns:
+        bool: True si el hilo está listo, False si está ocupado.
+    """
+    thread_messages = client.beta.threads.messages.list(thread_id=thread_id)
+    for message in thread_messages.data:
+        if message.role == "assistant" and message.status == "in_progress":
+            return False  # Hay una respuesta en proceso
+    return True
 
 class EventHandler(AssistantEventHandler):
     """
@@ -443,7 +460,6 @@ class EventHandler(AssistantEventHandler):
 
         # Create new text box
         st.session_state.text_boxes.append(st.empty())
-        st.session_state.assistant_text.append("")
         
         # # Display image in textbox
         image_html = f'<p align="center"><img src="data:image/png;base64,{data_url}" width=600></p>'
@@ -457,6 +473,8 @@ class EventHandler(AssistantEventHandler):
         
         # Delete file from OpenAI
         client.files.delete(image_file.file_id)
+        
+        st.session_state.last_interaction = datetime.now()
       
     def on_timeout(self):
         """
@@ -482,18 +500,18 @@ def retrieve_message_content(message_id: str, thread_id: str, client: OpenAI) ->
         client (OpenAI): Initialized OpenAI client instance
     
     Returns:
-        str: The text content of the message
+        str: Only the text content of the message
     """
     message = client.beta.threads.messages.retrieve(
         message_id=message_id,
         thread_id=thread_id
     )
     
-    # Extract text content from the message
-    # Messages can have multiple content parts, we aggregate all text content
-    content_parts = []
-    for content in message.content:
-        if content.type == 'text':
-            content_parts.append(content.text.value)
+    # Only process text content, ignore images
+    content_parts = [
+        content.text.value 
+        for content in message.content 
+        if content.type == 'text' and hasattr(content, 'text')
+    ]
     
-    return '\n'.join(content_parts)
+    return '\n'.join(content_parts) if content_parts else ""

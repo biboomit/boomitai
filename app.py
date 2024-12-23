@@ -12,6 +12,7 @@ from openai import OpenAI
 from utils import (
     delete_files,
     EventHandler,
+    is_thread_ready,
     moderation_endpoint,
     render_custom_css,
     render_download_files,
@@ -300,6 +301,11 @@ if st.session_state.show_text_input:
             
             client = StateManager.get_state("client")
  
+            if "thread_id" in st.session_state:
+                print("entro a thread_id")
+                if not is_thread_ready(st.session_state["thread_id"], client):
+                    print("El asistente aún está procesando una consulta anterior.")
+            
             # Crear un nuevo hilo (thread) si no existe uno
             if "thread_id" not in st.session_state:
                 thread = client.beta.threads.create()
@@ -312,7 +318,7 @@ if st.session_state.show_text_input:
             client.beta.threads.messages.create(
                 thread_id=st.session_state.thread_id,
                 role="user",
-                content=question
+                content=[{"type": "text", "text": question}]
             )
  
             st.session_state.text_boxes.append(st.empty())
