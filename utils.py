@@ -326,6 +326,7 @@ def is_thread_ready(thread_id: str, client: OpenAI) -> bool:
         bool: True si el hilo está listo, False si está ocupado.
     """
     thread_messages = client.beta.threads.messages.list(thread_id=thread_id)
+    #print(thread_messages)
     for message in thread_messages.data:
         if message.role == "assistant" and message.status == "in_progress":
             return False  # Hay una respuesta en proceso

@@ -299,36 +299,54 @@ if st.session_state.show_text_input:
             text_box.empty()
             qn_btn.empty()
             
-            client = StateManager.get_state("client")
- 
-            if "thread_id" in st.session_state:
-                print("entro a thread_id")
-                if not is_thread_ready(st.session_state["thread_id"], client):
-                    print("El asistente aún está procesando una consulta anterior.")
+            if moderation_endpoint(question):
+                st.warning("Your question has been flagged. Refresh page to try again.")
+                st.stop()
             
-            # Crear un nuevo hilo (thread) si no existe uno
+            client = StateManager.get_state("client")
+            
+            if client is None:
+                st.error("Error: Cliente no inicializado.")
+                st.stop()
+ 
+            if not is_thread_ready(st.session_state["thread_id"], client):
+                print("El asistente aún está procesando una consulta anterior.")
+                st.error("El hilo está ocupado. Intenta nuevamente más tarde.")
+                st.stop()
+
+            
             if "thread_id" not in st.session_state:
                 thread = client.beta.threads.create()
                 st.session_state.thread_id = thread.id
-
+            
  
             if "text_boxes" not in st.session_state:
                 st.session_state.text_boxes = []
+                
+            print("st.session_state.thread_id: ", st.session_state.thread_id)
+            
+            # TODO: Agregar un delay para dejar "pensar/procesa" la nueva pregunta post imagen
  
             client.beta.threads.messages.create(
-                thread_id=st.session_state.thread_id,
+                thread_id=StateManager.get_state("thread_id"),
                 role="user",
                 content=[{"type": "text", "text": question}]
             )
+            
+            
+            # thread_messages = client.beta.threads.messages.list(thread_id=st.session_state["thread_id"])
+            # print("1")
+            # print(thread_messages)
+            
  
-            st.session_state.text_boxes.append(st.empty())
+            #st.session_state.text_boxes.append(st.empty())
             #st.session_state.text_boxes[-1].success(f"**> 🤔 User:** {question}")
  
-            with client.beta.threads.runs.stream(thread_id=st.session_state.thread_id,
+            with client.beta.threads.runs.stream(thread_id=st.session_state["thread_id"],
                                                  assistant_id=StateManager.get_state("assistant_id"),
                                                  tool_choice={"type": "code_interpreter"},
                                                  event_handler=EventHandler(),
-                                                 temperature=0) as stream:
+                                                 temperature=0.3) as stream:
                 stream.until_done()
                 st.toast("BOOMIT AI ha terminado su análisis", icon="🕵️")
  
