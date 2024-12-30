@@ -294,4 +294,136 @@ Análisis de Correlaciones:
    - Eventos: un decimal para promedios, números enteros para totales
    - Correlaciones: dos decimales
 5. No incluir recomendaciones ni sugerencias de optimización""",
+"Reporte de Análisis Publicitario": f"""
+Objetivo
+Realizar un análisis detallado del rendimiento publicitario a nivel de plataforma para informar al equipo de estrategia de comunicación y publicidad digital sobre las acciones específicas a implementar.
+
+1. Criterios de Análisis Temporal
+- Identificar la fecha más reciente disponible (fecha de ayer)
+- Si no hay datos de ayer, usar la última fecha disponible como referencia
+
+2. Criterios de Exclusión
+- Eliminar del análisis:
+  * Plataformas sin inversión o con inversión prácticamente nula (0 o cercana a 0).
+
+3. Métricas de Evaluación por Plataforma
+3.1 Métricas Base
+Para todo el periodo, calcula:
+- Volumen total de eventos_objetivo
+- Costo medio por evento_objetivo = Inversión total / Total eventos_objetivo
+- Costo medio por instalación = Inversión total / Total instalaciones
+- Inversión total
+- CVR medio = Total eventos_objetivo / Total instalaciones
+- Correlación entre Inversión y CVR
+
+3.2 Análisis de Variaciones
+Calcular para cada métrica:
+- Variación porcentual entre períodos:
+  * Costo medio por evento_objetivo
+  * Volumen de eventos_objetivo
+  * Costo medio por instalación
+  * Volumen de instalaciones
+  * Inversión total
+
+3.3 Clasificación de Variaciones
+Para cada variación porcentual:
+- Tendencia:
+  * Creciente: >5%
+  * Decreciente: <-5%
+  * Estable: entre -5% y 5%
+- Magnitud del cambio:
+  * Significativo: >15%
+  * Moderado: 5-15%
+  * Estable: <5%
+
+4. Análisis de Saturación de Medio
+Evaluar para cada plataforma:
+- Relación inversión-resultados:
+  * Análisis de variaciones en costos y volúmenes de instalación
+  * Análisis de variaciones en costos y volúmenes de eventos_objetivo
+  * Identificación de relaciones no lineales entre inversión y resultados
+
+5. Formato de Respuesta
+
+5.1 Resumen General
+- Período total analizado (fechas específicas)
+- Resumen ejecutivo de tendencias principales por plataforma
+- Número total de plataformas analizadas
+
+5.2 Análisis por Plataforma
+Para cada plataforma:
+[Nombre de la Plataforma]:
+1. Análisis de Tendencias:
+   - Variaciones porcentuales de todas las métricas
+   - Clasificación de cambios (significativo/moderado/estable)
+   - Contraste con variaciones en inversión
+
+2. Análisis de Saturación:
+   - Evaluación de la relación inversión-resultados
+   - Identificación de puntos de saturación
+   - Eficiencia en la conversión
+
+5.3 Conclusiones y Recomendaciones
+- Análisis de redistribución de inversión entre plataformas
+- Tendencias críticas a monitorear
+- Evaluación global de eficiencia:
+  * Identificación de métricas más y menos eficientes
+  * Recomendaciones específicas basadas en datos
+  * Priorización de acciones inmediatas
+
+6. Notas Importantes
+- Todos los porcentajes deben presentarse con dos decimales
+- Montos monetarios con dos decimales
+- Eventos en números enteros
+- Correlaciones con dos decimales
+
+
+Respuesta optima:
+Período Total Analizado: Del 19 de octubre de 2024 al 26 de octubre de 2024 comparado con el 12 de octubre de 2024 al 18 de octubre de 2024.
+Tendencias Principales:
+Google Ads: Incremento significativo en inversión total (31.87%) y eventos objetivo (18.13%), pero disminución moderada en CVR medio (-8.29%).
+Meta: Estabilidad en la mayoría de las métricas con un ligero aumento en CVR medio (2.81%).
+TikTok Ads: Aumento significativo en instalaciones (15.63%) con una disminución moderada en CVR medio (-9.88%).
+Número Total de Plataformas Analizadas: 3
+Análisis por Plataforma:
+
+Google Ads:
+
+Análisis de Tendencias:
+
+Inversión total aumentó un 31.87%, eventos objetivo un 18.13%, e instalaciones un 28.81%.
+CVR medio disminuyó moderadamente (-8.29%).
+Costo medio por evento aumentó moderadamente (11.64%), mientras que el costo medio por instalación se mantuvo estable (2.38%).
+Análisis de Saturación:
+
+Incremento en inversión resultó en un aumento significativo en eventos e instalaciones, pero con una eficiencia de conversión decreciente.
+Meta:
+
+Análisis de Tendencias:
+
+Inversión total y eventos objetivo se mantuvieron estables.
+Instalaciones disminuyeron ligeramente (-3.39%).
+CVR medio aumentó levemente (2.81%).
+Costo medio por evento e instalación mostraron estabilidad y un aumento moderado respectivamente.
+Análisis de Saturación:
+
+Relación inversión-resultados estable, pero con una ligera mejora en eficiencia de conversión.
+TikTok Ads:
+
+Análisis de Tendencias:
+
+Inversión total se mantuvo estable.
+Eventos objetivo aumentaron un 4.20% e instalaciones un 15.63%.
+CVR medio disminuyó moderadamente (-9.88%).
+Costo medio por evento se mantuvo estable, mientras que el costo medio por instalación disminuyó moderadamente (-13.52%).
+Análisis de Saturación:
+
+Aumento en instalaciones con una disminución en eficiencia de conversión.
+Conclusiones y Recomendaciones:
+
+Redistribución de Inversión: Considerar aumentar la inversión en Google Ads debido a su incremento en eventos e instalaciones, pero monitorear la eficiencia de conversión.
+Tendencias Críticas a Monitorear: La eficiencia de conversión en TikTok Ads y Google Ads.
+Evaluación Global de Eficiencia: Google Ads mostró un buen rendimiento en volumen, pero necesita mejorar en eficiencia de conversión. TikTok Ads debe enfocarse en mejorar su CVR medio.
+Recomendaciones Específicas: Aumentar inversión en plataformas con crecimiento significativo en eventos e instalaciones, pero con atención a la eficiencia de conversión.
+"""
         }
