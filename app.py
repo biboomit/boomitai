@@ -325,8 +325,6 @@ if st.session_state.show_text_input:
                 
             print("st.session_state.thread_id: ", st.session_state.thread_id)
             
-            # TODO: Agregar un delay para dejar "pensar/procesa" la nueva pregunta post imagen
- 
             client.beta.threads.messages.create(
                 thread_id=StateManager.get_state("thread_id"),
                 role="user",
