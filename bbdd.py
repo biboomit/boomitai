@@ -72,9 +72,9 @@ def query_selector(client):
                         nombre_campana,
                         (SELECT `dimensiones.Data_Cruda.codigo_plataforma`(SPLIT(nombre_campana, '_')[OFFSET(3)])) AS plataforma,
                         costo_total,
-                        (Rango25_29 + Rango30_35 + Rango36_40 + Rango41_45) as lead_total_calificado,
+                        lead_total_calificado as lead_total_calificado,
                         usuarios_totales
-                    FROM `alige-boomit.Dashboard.tabla_final_std`
+                    FROM `alige-boomit.Dashboard.tabla_final`
                     WHERE nombre_campana LIKE '%BOOMIT%'
                         AND fecha >= (DATE_ADD(CURRENT_DATE(), INTERVAL -15 DAY)) 
                         AND (SELECT `dimensiones.Data_Cruda.codigo_estrategia`(SPLIT(nombre_campana, '_')[OFFSET(4)])) 
@@ -102,9 +102,9 @@ def query_selector(client):
                         nombre_campana,
                         (SELECT `dimensiones.Data_Cruda.codigo_plataforma`(SPLIT(nombre_campana, '_')[OFFSET(3)])) AS plataforma,
                         costo_total,
-                        (Rango25_29 + Rango30_35 + Rango36_40 + Rango41_45) as lead_total_calificado,
+                        lead_total_calificado as lead_total_calificado,
                         usuarios_totales
-                    FROM `alige-boomit.Dashboard.tabla_final_std`
+                    FROM `alige-boomit.Dashboard.tabla_final`
                     WHERE nombre_campana LIKE '%BOOMIT%'
                         AND fecha >= (DATE_ADD(CURRENT_DATE(), INTERVAL -15 DAY)) 
                         AND (SELECT `dimensiones.Data_Cruda.codigo_estrategia`(SPLIT(nombre_campana, '_')[OFFSET(4)])) 
@@ -132,9 +132,9 @@ def query_selector(client):
                         nombre_campana,
                         (SELECT `dimensiones.Data_Cruda.codigo_plataforma`(SPLIT(nombre_campana, '_')[OFFSET(3)])) AS plataforma,
                         costo_total,
-                        (Rango25_29 + Rango30_35 + Rango36_40 + Rango41_45) as lead_total_calificado,
+                        lead_total_calificado as lead_total_calificado,
                         usuarios_totales
-                    FROM `alige-boomit.Dashboard.tabla_final_std`
+                    FROM `alige-boomit.Dashboard.tabla_final`
                     WHERE nombre_campana LIKE '%BOOMIT%'
                         AND fecha >= (DATE_ADD(CURRENT_DATE(), INTERVAL -15 DAY)) 
                         AND (SELECT `dimensiones.Data_Cruda.codigo_estrategia`(SPLIT(nombre_campana, '_')[OFFSET(4)])) 
