@@ -396,19 +396,19 @@ class EventHandler(AssistantEventHandler):
         Handler for when a tool call delta is created
         """
         if delta.type == "code_interpreter" and delta.code_interpreter:
-            #if delta.code_interpreter.input:
+            if delta.code_interpreter.input:
                 # Ir a la última caja de texto
-                #with st.session_state.text_boxes[-1]:
-                    #if f"code_box_{len(st.session_state.text_boxes)}" not in st.session_state:
+                with st.session_state.text_boxes[-1]:
+                    if f"code_box_{len(st.session_state.text_boxes)}" not in st.session_state:
                         # Expandir código en un contenedor
-                        #st.session_state[f"code_expander_{len(st.session_state.text_boxes)}"] = st.status("**💻 Code**", expanded=True)
-                        #st.session_state[f"code_box_{len(st.session_state.text_boxes)}"] = st.session_state[f"code_expander_{len(st.session_state.text_boxes)}"].empty()
+                        st.session_state[f"code_expander_{len(st.session_state.text_boxes)}"] = st.status("**💻 Code**", expanded=True)
+                        st.session_state[f"code_box_{len(st.session_state.text_boxes)}"] = st.session_state[f"code_expander_{len(st.session_state.text_boxes)}"].empty()
 
                 # Limpiar la caja de código
-                #st.session_state[f"code_box_{len(st.session_state.text_boxes)}"].empty()
-                #if delta.code_interpreter.input:
-                #    st.session_state.code_input[-1] += delta.code_interpreter.input
-                #st.session_state[f"code_box_{len(st.session_state.text_boxes)}"].code(st.session_state.code_input[-1])
+                st.session_state[f"code_box_{len(st.session_state.text_boxes)}"].empty()
+                if delta.code_interpreter.input:
+                   st.session_state.code_input[-1] += delta.code_interpreter.input
+                st.session_state[f"code_box_{len(st.session_state.text_boxes)}"].code(st.session_state.code_input[-1])
 
             # Output generado por el código (solo si show_output es True)
             if delta.code_interpreter.outputs and show_output:
