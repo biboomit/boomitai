@@ -7,7 +7,7 @@ from PIL import Image
 import streamlit as st
 import bbdd
 import pandas as pd
-from obtener_file_id import upload_file
+from obtener_file_id import upload_file, upload_code_file
 from openai import OpenAI
 from utils import (
     delete_files,
@@ -25,6 +25,7 @@ from src.promptsManager.manager import Manager
 from src.config.proyectos_names import ProyectosNames
 from src.state.state_manager import StateManager
 from src.state.initializer import initialize_session_state
+from src.promptsManager.code_file_per_prompt import code as code_for_prompts
 
 def render_conversation_history():
     """
@@ -161,7 +162,7 @@ if show_client_dropdown:
             # Formatear la fecha y hora actual en el formato deseado
             timestamp = now.strftime("%Y%m%d%H%M%S")
             
-            file_name = f"{cliente_seleccionado}_{timestamp}_csvEnJsonl.jsonl"
+            file_name = f"datos.jsonl"
             
             if not StateManager.get_state("file_id"):
                 file_info = upload_file(StateManager.get_state("gbq_data").to_csv(index=False), file_name)
@@ -173,7 +174,7 @@ if show_client_dropdown:
             # Initialise the OpenAI client, and retrieve the assistant
             client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
             StateManager.update_state("client", client)
-            assistant = client.beta.assistants.retrieve(st.secrets["ASSISTANT_ID_2"])
+            assistant = client.beta.assistants.retrieve(st.secrets["ASSISTANT_ID_3"])
             StateManager.update_state("assistant_id", assistant.id)
             
             # Define una lista de prompts predefinidos
@@ -210,12 +211,14 @@ if show_client_dropdown:
                         thread = client.beta.threads.create()
                         StateManager.update_state("thread_id", thread.id)
 
+                    code_file = upload_code_file(code_for_prompts[titulo_abreviado], "code_to_execute.jsonl")
+                    
                     # Configure thread with file resources
                     client.beta.threads.update(
                         thread_id=StateManager.get_state("thread_id"),
-                        tool_resources={"code_interpreter": {"file_ids": [StateManager.get_state("file_id")]}}
+                        tool_resources={"code_interpreter": {"file_ids": [StateManager.get_state("file_id"), code_file["id"]]}}
                     )
-
+                    
                     # Create message in thread
                     client.beta.threads.messages.create(
                         thread_id=StateManager.get_state("thread_id"),
