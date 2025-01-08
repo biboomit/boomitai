@@ -5,6 +5,7 @@ PROJECT_ROOT = Path(__file__).parent.parent
 
 prompt1 = PROJECT_ROOT / 'optimization' / 'codigo' / 'prompt1.py'
 prompt2 = PROJECT_ROOT / 'optimization' / 'codigo' / 'prompt2.py'
+prompt3 = PROJECT_ROOT / 'optimization' / 'codigo' / 'prompt3.py'
 
 def leer_prompt1():
     return prompt1.read_text(encoding='utf-8')
@@ -13,9 +14,7 @@ def leer_prompt2():
     return prompt2.read_text(encoding='utf-8')
     
 def leer_prompt3():
-    # with open(ruta_normalizada_prompt3, 'r') as archivo:
-    #     return archivo.read()
-    ...
+    return prompt3.read_text(encoding='utf-8')
     
 def leer_prompt4():
     # with open(ruta_normalizada_prompt4, 'r') as archivo:
