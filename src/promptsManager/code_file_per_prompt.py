@@ -4,23 +4,13 @@ from pathlib import Path
 PROJECT_ROOT = Path(__file__).parent.parent
 
 prompt1 = PROJECT_ROOT / 'optimization' / 'codigo' / 'prompt1.py'
-
-# prompt1 = os.path.join('..', 'optimization', 'codigo', 'prompt1.py')
-# prompt2 = os.path.join('..', 'optimization', 'codigo', 'prompt2.py')
-# prompt3 = os.path.join('..', 'optimization', 'codigo', 'prompt3.py')
-# prompt4 = os.path.join('..', 'optimization', 'codigo', 'prompt4.py')
-# ruta_normalizada_prompt1 = os.path.normpath(prompt1) 
-# ruta_normalizada_prompt2 = os.path.normpath(prompt2)
-# ruta_normalizada_prompt3 = os.path.normpath(prompt3)
-# ruta_normalizada_prompt4 = os.path.normpath(prompt4)
+prompt2 = PROJECT_ROOT / 'optimization' / 'codigo' / 'prompt2.py'
 
 def leer_prompt1():
     return prompt1.read_text(encoding='utf-8')
     
 def leer_prompt2():
-    # with open(ruta_normalizada_prompt2, 'r') as archivo:
-    #     return archivo.read()
-    ...
+    return prompt2.read_text(encoding='utf-8')
     
 def leer_prompt3():
     # with open(ruta_normalizada_prompt3, 'r') as archivo:

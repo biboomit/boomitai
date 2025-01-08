@@ -191,10 +191,6 @@ if show_client_dropdown:
             with col1:
                 if st.button("Preguntar a Boomit AI"):
                     st.caption('Procesando. Aguarde por favor...')
-                    my_bar = st.progress(0)
-                    for pct_complete in range(100):
-                        time.sleep(0.05)
-                        my_bar.progress(pct_complete)
 
                     # Initialize response parameters
                     question = Manager().obtenerPrompt(cliente_seleccionado, titulo_abreviado)
@@ -237,8 +233,6 @@ if show_client_dropdown:
                         stream.until_done()
                         st.toast("BOOMIT AI ha terminado su análisis", icon="🕵️")
                     
-                    my_bar.empty()
-
                     # Response processing and state management
                     assistant_messages = retrieve_messages_from_thread(st.session_state.thread_id)
                     if assistant_messages:
