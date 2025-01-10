@@ -92,4 +92,4 @@ exclusion_summary = {
     "remaining_campaigns": merged_filtered['Campania'].nunique()
 }
 
-best_campaign, worst_campaign, exclusion_summary
+previous_period_start.strftime('%Y-%m-%d') + ' to ' + previous_period_end.strftime('%Y-%m-%d'), current_period_start.strftime('%Y-%m-%d') + ' to ' + current_period_end.strftime('%Y-%m-%d'), best_campaign, worst_campaign, exclusion_summary

@@ -37,7 +37,9 @@ def calculate_metrics(df, platform):
 platforms = data['Plataforma'].unique()
 
 # Calculate metrics for each platform in both periods
-results = {}
+results = {
+
+}
 for platform in platforms:
     inv_prev, cost_prev = calculate_metrics(df_previous, platform)
     inv_curr, cost_curr = calculate_metrics(df_current, platform)

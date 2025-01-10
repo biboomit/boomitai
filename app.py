@@ -215,11 +215,13 @@ if show_client_dropdown:
                         tool_resources={"code_interpreter": {"file_ids": [StateManager.get_state("file_id"), code_file["id"]]}}
                     )
                     
+                    dates = Manager().obtenerFechas(cliente_seleccionado, titulo_abreviado)
+                    
                     # Create message in thread
                     client.beta.threads.messages.create(
                         thread_id=StateManager.get_state("thread_id"),
                         role="user",
-                        content=[{"type": "text", "text": question}]
+                        content=[{"type": "text", "text": dates}, {"type": "text", "text": question}]
                     )
                     
                     # Stream processing with progress indication
