@@ -51,4 +51,6 @@ comparison['var_instalaciones'] = (comparison['Instalaciones_current'] - compari
 comparison['var_inversion'] = (comparison['inversion_current'] - comparison['inversion_previous']) / comparison['inversion_previous'] * 100
 
 # Display the comparison results
-comparison[['var_costo_medio_evento', 'var_eventos', 'var_costo_medio_instalacion', 'var_instalaciones', 'var_inversion']], period_start.strftime('%Y-%m-%d') + ' to ' + period_end.strftime('%Y-%m-%d'), previous_period_start.strftime('%Y-%m-%d') + ' to ' + previous_period_end.strftime('%Y-%m-%d'), 
+results = comparison[['var_costo_medio_evento', 'var_eventos', 'var_costo_medio_instalacion', 'var_instalaciones', 'var_inversion']]
+
+results

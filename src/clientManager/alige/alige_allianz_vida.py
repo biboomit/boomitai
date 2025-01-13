@@ -30,7 +30,7 @@ class AligeAllianzVida(Client):
                 'start_date': data_dict['period_previous_start'],
                 'end_date': data_dict['period_current_end']
             }
-        elif promptKey == 'Comparativa de rendimiento entre medios':
+        elif promptKey == 'Reporte de Análisis Publicitario':
             dates = bbdd.get_data_range(client)
             data_dict = dates.iloc[0].to_dict()
             return data_dict
