@@ -22,6 +22,9 @@ class Manager():
         elif client == ProyectosNames.DEMO.value:
             from ..clientManager.peigo import Peigo
             return Peigo(), ProyectosNames.DEMO.value
+        elif client == ProyectosNames.TRADERPAL.value:
+            from ..clientManager.traderpal import TraderPal
+            return TraderPal(), ProyectosNames.TRADERPAL.value
         else:
             return None
         
