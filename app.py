@@ -78,9 +78,9 @@ render_custom_css()
 initialize_session_state() 
  
 clientes_por_equipo = {
-    "equipo_verde": [ProyectosNames.ALIGE_ALLIANZ_AHORRO.value, ProyectosNames.ALIGE_ALLIANZ_VIDA.value, ProyectosNames.ALIGE_SKANDIA_AHORRO.value], # ["LAFISE PN", "LAFISE RD", "LAFISE HN", "ALIGE"],
-    "equipo_amarillo": [ProyectosNames.PEIGO.value], # ["PEIGO", "KASH", "DLOCALGO", "BANPAIS"],
-    "equipo_violeta": [ProyectosNames.THEYARD.value], # ["BOOMIT", "THEYARD"]
+    "equipo_verde": [ProyectosNames.ALIGE_ALLIANZ_AHORRO.value, ProyectosNames.ALIGE_ALLIANZ_VIDA.value, ProyectosNames.ALIGE_SKANDIA_AHORRO.value, ProyectosNames.TRADERPAL.value], 
+    "equipo_amarillo": [ProyectosNames.PEIGO.value], 
+    "equipo_violeta": [ProyectosNames.THEYARD.value, ], 
     "Demo Boomit": [ProyectosNames.DEMO.value]
 }
  

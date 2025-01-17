@@ -6,16 +6,20 @@ from google.cloud import bigquery
 import streamlit as st
 from src.config.secrets import keys
 
+
 def queryBigQuery(query):
     # Carga las credenciales desde secrets.toml
     credentials_dict = json.loads(st.secrets["BIGQUERY_CREDENTIALS"])
-    credentials = service_account.Credentials.from_service_account_info(credentials_dict)
-    
+    credentials = service_account.Credentials.from_service_account_info(
+        credentials_dict
+    )
+
     # Inicializa el cliente de BigQuery con las credenciales cargadas
     client = bigquery.Client(credentials=credentials, project=credentials.project_id)
     query_job = client.query(query)
     df = query_job.to_dataframe()
     return df
+
 
 def query_selector(client):
     query = None
@@ -50,9 +54,9 @@ def query_selector(client):
                     HAVING SUM(total_cost) > 0"""
     elif client == ProyectosNames.THEYARD.value:
         query = """ TODO """
-    elif client == 'TRDELPAL':
+    elif client == "TRDELPAL":
         query = """ TODO """
-    elif client == 'LAFISE PN':
+    elif client == "LAFISE PN":
         query = """ TODO"""
     elif client == ProyectosNames.ALIGE_ALLIANZ_AHORRO.value:
         query = f"""SELECT 
@@ -177,10 +181,41 @@ def query_selector(client):
                     ) 
                     GROUP BY fecha, Campaign, plataforma
                     HAVING SUM(total_cost) > 0"""
+    elif client == ProyectosNames.TRADERPAL.value:
+        query = """select
+        fecha as Fecha,
+        nombre_campana as Campania,
+        plataforma as Plataforma,
+        sum(costo_total) as inversion,
+        sum(sng_first_funding) as evento_objetivo,
+        sum(installs) as evento_inicial,
+        case
+          when sum(sng_first_funding) = 0 or sum(installs) = 0 then 0
+          else sum(sng_first_funding) / sum(installs)
+        end as CVR
+        from (
+          SELECT
+          fecha,
+          nombre_campana,
+          (SELECT `dimensiones.Data_Cruda.codigo_plataforma`(SPLIT(nombre_campana, '_')[OFFSET(3)])) AS plataforma,
+          costo_total,
+          sng_first_funding,
+          installs
+          FROM `traderpal-boomit.Dashboard.tabla_final`
+          WHERE nombre_campana LIKE '%BOOMIT%'
+          AND fecha >= (DATE_ADD(CURRENT_DATE(), INTERVAL -15 DAY))
+          AND (SELECT `dimensiones.Data_Cruda.codigo_estrategia`(SPLIT(nombre_campana, '_')[OFFSET(4)]))
+            IN UNNEST(['PERFORMANCE', 'PURCHASE', 'TRAFICO', 'ADQUISICION', 'RETENCION',
+            'RECOMPRADORES', 'RETENCION Y RECOMPRADORES', 'CAPTACION', 'RETARGETING'])
+        )
+        GROUP BY fecha, nombre_campana, plataforma
+        HAVING SUM(costo_total) > 0"""
+
     if query is None:
         raise ValueError(f"Client '{client}' is not recognized.")
-    
+
     return query
+
 
 def date_query_selector(client):
     query = None
@@ -215,9 +250,29 @@ def date_query_selector(client):
                     HAVING SUM(total_cost) > 0)"""
     elif client == ProyectosNames.THEYARD.value:
         query = """ TODO """
-    elif client == 'TRDELPAL':
-        query = """ TODO """
-    elif client == 'LAFISE PN':
+    elif client == ProyectosNames.TRADERPAL.value:
+        query = """SELECT 
+    max(fecha) as period_current_end,
+    (DATE_ADD(max(fecha), INTERVAL -6 DAY)) as period_current_start,
+    (DATE_ADD(max(fecha), INTERVAL -13 DAY)) as period_previous_start,
+    (DATE_ADD(max(fecha), INTERVAL -7 DAY)) as period_previous_end,
+    FROM (
+  SELECT
+  fecha,
+  nombre_campana,
+  (SELECT `dimensiones.Data_Cruda.codigo_plataforma`(SPLIT(nombre_campana, '_')[OFFSET(3)])) AS plataforma,
+  costo_total,
+  sng_first_funding,
+  installs
+  FROM `traderpal-boomit.Dashboard.tabla_final`
+  WHERE nombre_campana LIKE '%BOOMIT%'
+  AND fecha >= (DATE_ADD(CURRENT_DATE(), INTERVAL -15 DAY))
+  AND (SELECT `dimensiones.Data_Cruda.codigo_estrategia`(SPLIT(nombre_campana, '_')[OFFSET(4)]))
+    IN UNNEST(['PERFORMANCE', 'PURCHASE', 'TRAFICO', 'ADQUISICION', 'RETENCION',
+    'RECOMPRADORES', 'RETENCION Y RECOMPRADORES', 'CAPTACION', 'RETARGETING'])
+)
+HAVING SUM(costo_total) > 0"""
+    elif client == "LAFISE PN":
         query = """ TODO"""
     elif client == ProyectosNames.ALIGE_ALLIANZ_AHORRO.value:
         query = f"""SELECT 
@@ -336,10 +391,9 @@ def date_query_selector(client):
                     HAVING SUM(total_cost) > 0)"""
     if query is None:
         raise ValueError(f"Client '{client}' is not recognized.")
-    
+
     return query
-    
-    
+
 
 def get_data(client):
     # Parsear las credenciales desde el formato JSON serializado en secrets.toml
@@ -349,6 +403,7 @@ def get_data(client):
     bx_data = bq_client.query(query).to_dataframe()
 
     return bx_data
+
 
 def get_data_range(client):
     # Parsear las credenciales desde el formato JSON serializado en secrets.toml
