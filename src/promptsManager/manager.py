@@ -25,6 +25,15 @@ class Manager():
         elif client == ProyectosNames.TRADERPAL.value:
             from ..clientManager.traderpal import TraderPal
             return TraderPal(), ProyectosNames.TRADERPAL.value
+        elif client == ProyectosNames.LAFISERD.value:
+            from ..clientManager.lafise.lafise_republica_dominicana import LafiseRepublicaDominicana
+            return LafiseRepublicaDominicana(), ProyectosNames.LAFISERD.value
+        elif client == ProyectosNames.LAFISEPN.value:
+            from ..clientManager.lafise.lafise_panama import LafisePanama
+            return LafisePanama(), ProyectosNames.LAFISEPN.value
+        elif client == ProyectosNames.LAFISEHN.value:
+            from ..clientManager.lafise.lafise_honduras import LafiseHonduras
+            return LafiseHonduras(), ProyectosNames.LAFISEHN.value
         else:
             return None
         
