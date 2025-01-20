@@ -60,156 +60,156 @@ HAVING SUM(costo_total) > 0"""
         query = """ TODO"""
     elif client == ProyectosNames.ALIGE_ALLIANZ_AHORRO.value:
         query = f"""SELECT 
-                    fecha as Fecha,
-                    nombre_campana as Campania,
-                    plataforma as Plataforma,
-                    SUM(costo_total) AS inversion,
-                    SUM(lead_total_calificado) AS evento_objetivo,
-                    SUM(usuarios_totales) AS evento_inicial,
-                    CASE 
-                        WHEN SUM(lead_total_calificado) = 0 OR SUM(usuarios_totales) = 0 THEN 0
-                        ELSE SUM(lead_total_calificado) / SUM(usuarios_totales) 
-                    END AS cvr 
-                    FROM (
-                    SELECT 
-                        fecha,
-                        nombre_campana,
-                        (SELECT `dimensiones.Data_Cruda.codigo_plataforma`(SPLIT(nombre_campana, '_')[OFFSET(3)])) AS plataforma,
-                        costo_total,
-                        lead_total_calificado as lead_total_calificado,
-                        usuarios_totales
-                    FROM `alige-boomit.Dashboard.tabla_final`
-                    WHERE nombre_campana LIKE '%BOOMIT%'
-                        AND fecha >= (DATE_ADD(CURRENT_DATE(), INTERVAL -15 DAY)) 
-                        AND (SELECT `dimensiones.Data_Cruda.codigo_estrategia`(SPLIT(nombre_campana, '_')[OFFSET(4)])) 
-                            IN UNNEST(['PERFORMANCE', 'PURCHASE', 'TRAFICO', 'ADQUISICION', 'RETENCION', 
-                            'RECOMPRADORES', 'RETENCION Y RECOMPRADORES', 'CAPTACION', 'RETARGETING'])
-                        AND flag_producto = '{SubProyectosNames.ALIGE_ALLIANZ_AHORRO.value}'
-                    ) 
-                    GROUP BY fecha, nombre_campana, plataforma
-                    HAVING SUM(costo_total) > 0"""
+fecha as Fecha,
+nombre_campana as Campania,
+plataforma as Plataforma,
+SUM(costo_total) AS inversion,
+SUM(lead_total_calificado) AS evento_objetivo,
+SUM(usuarios_totales) AS evento_inicial,
+CASE 
+    WHEN SUM(lead_total_calificado) = 0 OR SUM(usuarios_totales) = 0 THEN 0
+    ELSE SUM(lead_total_calificado) / SUM(usuarios_totales) 
+END AS cvr 
+FROM (
+SELECT 
+    fecha,
+    nombre_campana,
+    (SELECT `dimensiones.Data_Cruda.codigo_plataforma`(SPLIT(nombre_campana, '_')[OFFSET(3)])) AS plataforma,
+    costo_total,
+    lead_total_calificado as lead_total_calificado,
+    usuarios_totales
+FROM `alige-boomit.Dashboard.tabla_final`
+WHERE nombre_campana LIKE '%BOOMIT%'
+    AND fecha >= (DATE_ADD(CURRENT_DATE(), INTERVAL -15 DAY)) 
+    AND (SELECT `dimensiones.Data_Cruda.codigo_estrategia`(SPLIT(nombre_campana, '_')[OFFSET(4)])) 
+        IN UNNEST(['PERFORMANCE', 'PURCHASE', 'TRAFICO', 'ADQUISICION', 'RETENCION', 
+        'RECOMPRADORES', 'RETENCION Y RECOMPRADORES', 'CAPTACION', 'RETARGETING'])
+    AND flag_producto = '{SubProyectosNames.ALIGE_ALLIANZ_AHORRO.value}'
+) 
+GROUP BY fecha, nombre_campana, plataforma
+HAVING SUM(costo_total) > 0"""
     elif client == ProyectosNames.ALIGE_ALLIANZ_VIDA.value:
         query = f"""SELECT 
-                    fecha as Fecha,
-                    nombre_campana as Campania,
-                    plataforma as Plataforma,
-                    SUM(costo_total) AS inversion,
-                    SUM(lead_total_calificado) AS evento_objetivo,
-                    SUM(usuarios_totales) AS evento_inicial,
-                    CASE 
-                        WHEN SUM(lead_total_calificado) = 0 OR SUM(usuarios_totales) = 0 THEN 0
-                        ELSE SUM(lead_total_calificado) / SUM(usuarios_totales) 
-                    END AS cvr 
-                    FROM (
-                    SELECT 
-                        fecha,
-                        nombre_campana,
-                        (SELECT `dimensiones.Data_Cruda.codigo_plataforma`(SPLIT(nombre_campana, '_')[OFFSET(3)])) AS plataforma,
-                        costo_total,
-                        lead_total_calificado as lead_total_calificado,
-                        usuarios_totales
-                    FROM `alige-boomit.Dashboard.tabla_final`
-                    WHERE nombre_campana LIKE '%BOOMIT%'
-                        AND fecha >= (DATE_ADD(CURRENT_DATE(), INTERVAL -15 DAY)) 
-                        AND (SELECT `dimensiones.Data_Cruda.codigo_estrategia`(SPLIT(nombre_campana, '_')[OFFSET(4)])) 
-                            IN UNNEST(['PERFORMANCE', 'PURCHASE', 'TRAFICO', 'ADQUISICION', 'RETENCION', 
-                            'RECOMPRADORES', 'RETENCION Y RECOMPRADORES', 'CAPTACION', 'RETARGETING'])
-                        AND flag_producto = '{SubProyectosNames.ALIGE_ALLIANZ_VIDA.value}'
-                    ) 
-                    GROUP BY fecha, nombre_campana, plataforma
-                    HAVING SUM(costo_total) > 0"""
+fecha as Fecha,
+nombre_campana as Campania,
+plataforma as Plataforma,
+SUM(costo_total) AS inversion,
+SUM(lead_total_calificado) AS evento_objetivo,
+SUM(usuarios_totales) AS evento_inicial,
+CASE 
+    WHEN SUM(lead_total_calificado) = 0 OR SUM(usuarios_totales) = 0 THEN 0
+    ELSE SUM(lead_total_calificado) / SUM(usuarios_totales) 
+END AS cvr 
+FROM (
+SELECT 
+    fecha,
+    nombre_campana,
+    (SELECT `dimensiones.Data_Cruda.codigo_plataforma`(SPLIT(nombre_campana, '_')[OFFSET(3)])) AS plataforma,
+    costo_total,
+    lead_total_calificado as lead_total_calificado,
+    usuarios_totales
+FROM `alige-boomit.Dashboard.tabla_final`
+WHERE nombre_campana LIKE '%BOOMIT%'
+    AND fecha >= (DATE_ADD(CURRENT_DATE(), INTERVAL -15 DAY)) 
+    AND (SELECT `dimensiones.Data_Cruda.codigo_estrategia`(SPLIT(nombre_campana, '_')[OFFSET(4)])) 
+        IN UNNEST(['PERFORMANCE', 'PURCHASE', 'TRAFICO', 'ADQUISICION', 'RETENCION', 
+        'RECOMPRADORES', 'RETENCION Y RECOMPRADORES', 'CAPTACION', 'RETARGETING'])
+    AND flag_producto = '{SubProyectosNames.ALIGE_ALLIANZ_VIDA.value}'
+) 
+GROUP BY fecha, nombre_campana, plataforma
+HAVING SUM(costo_total) > 0"""
     elif client == ProyectosNames.ALIGE_SKANDIA_AHORRO.value:
         query = f"""SELECT 
-                    fecha as Fecha,
-                    nombre_campana as Campania,
-                    plataforma as Plataforma,
-                    SUM(costo_total) AS inversion,
-                    SUM(lead_total_calificado) AS evento_objetivo,
-                    SUM(usuarios_totales) AS evento_inicial,
-                    CASE 
-                        WHEN SUM(lead_total_calificado) = 0 OR SUM(usuarios_totales) = 0 THEN 0
-                        ELSE SUM(lead_total_calificado) / SUM(usuarios_totales) 
-                    END AS cvr 
-                    FROM (
-                    SELECT 
-                        fecha,
-                        nombre_campana,
-                        (SELECT `dimensiones.Data_Cruda.codigo_plataforma`(SPLIT(nombre_campana, '_')[OFFSET(3)])) AS plataforma,
-                        costo_total,
-                        lead_total_calificado as lead_total_calificado,
-                        usuarios_totales
-                    FROM `alige-boomit.Dashboard.tabla_final`
-                    WHERE nombre_campana LIKE '%BOOMIT%'
-                        AND fecha >= (DATE_ADD(CURRENT_DATE(), INTERVAL -15 DAY)) 
-                        AND (SELECT `dimensiones.Data_Cruda.codigo_estrategia`(SPLIT(nombre_campana, '_')[OFFSET(4)])) 
-                            IN UNNEST(['PERFORMANCE', 'PURCHASE', 'TRAFICO', 'ADQUISICION', 'RETENCION', 
-                            'RECOMPRADORES', 'RETENCION Y RECOMPRADORES', 'CAPTACION', 'RETARGETING'])
-                        AND flag_producto = '{SubProyectosNames.ALIGE_SKANDIA_AHORRO.value}'
-                    ) 
-                    GROUP BY fecha, nombre_campana, plataforma
-                    HAVING SUM(costo_total) > 0"""
+fecha as Fecha,
+nombre_campana as Campania,
+plataforma as Plataforma,
+SUM(costo_total) AS inversion,
+SUM(lead_total_calificado) AS evento_objetivo,
+SUM(usuarios_totales) AS evento_inicial,
+CASE 
+    WHEN SUM(lead_total_calificado) = 0 OR SUM(usuarios_totales) = 0 THEN 0
+    ELSE SUM(lead_total_calificado) / SUM(usuarios_totales) 
+END AS cvr 
+FROM (
+SELECT 
+    fecha,
+    nombre_campana,
+    (SELECT `dimensiones.Data_Cruda.codigo_plataforma`(SPLIT(nombre_campana, '_')[OFFSET(3)])) AS plataforma,
+    costo_total,
+    lead_total_calificado as lead_total_calificado,
+    usuarios_totales
+FROM `alige-boomit.Dashboard.tabla_final`
+WHERE nombre_campana LIKE '%BOOMIT%'
+    AND fecha >= (DATE_ADD(CURRENT_DATE(), INTERVAL -15 DAY)) 
+    AND (SELECT `dimensiones.Data_Cruda.codigo_estrategia`(SPLIT(nombre_campana, '_')[OFFSET(4)])) 
+        IN UNNEST(['PERFORMANCE', 'PURCHASE', 'TRAFICO', 'ADQUISICION', 'RETENCION', 
+        'RECOMPRADORES', 'RETENCION Y RECOMPRADORES', 'CAPTACION', 'RETARGETING'])
+    AND flag_producto = '{SubProyectosNames.ALIGE_SKANDIA_AHORRO.value}'
+) 
+GROUP BY fecha, nombre_campana, plataforma
+HAVING SUM(costo_total) > 0"""
     elif client == ProyectosNames.DEMO.value:
         query = """SELECT 
-                    fecha as Fecha,
-                    Campaign as Campania,
-                    plataforma as Plataforma,
-                    SUM(total_cost) AS inversion,
-                    SUM(bankaccount_created_UU) AS evento_objetivo,
-                    SUM(install) AS Instalaciones,
-                    CASE 
-                        WHEN SUM(bankaccount_created_UU) = 0 OR SUM(install) = 0 THEN 0
-                        ELSE SUM(bankaccount_created_UU) / SUM(install) 
-                    END AS cvr 
-                    FROM (
-                    SELECT 
-                        fecha,
-                        REGEXP_REPLACE(
-                            Campaign, 
-                            r'BOOMIT_PEIG_', 
-                            'BOOMIT_DEMO_'
-                        ) AS Campaign,
-                        (SELECT `dimensiones.Data_Cruda.codigo_plataforma`(SPLIT(Campaign, '_')[OFFSET(3)])) AS plataforma,
-                        total_cost,
-                        bankaccount_created_UU,
-                        install
-                    FROM `peigo-boomit.Datos_Dash.Android_IOS_Raw_AF`
-                    WHERE Campaign LIKE '%BOOMIT%'
-                        AND fecha >= (DATE_ADD(CURRENT_DATE(), INTERVAL -15 DAY)) 
-                        AND (SELECT `dimensiones.Data_Cruda.codigo_estrategia`(SPLIT(Campaign, '_')[OFFSET(4)])) 
-                            IN UNNEST(['PERFORMANCE', 'PURCHASE', 'TRAFICO', 'ADQUISICION', 'RETENCION', 
-                            'RECOMPRADORES', 'RETENCION Y RECOMPRADORES', 'CAPTACION', 'RETARGETING'])
-                    ) 
-                    GROUP BY fecha, Campaign, plataforma
-                    HAVING SUM(total_cost) > 0"""
+fecha as Fecha,
+nombre_campana as Campania,
+plataforma as Plataforma,
+SUM(costo_total) AS inversion,
+SUM(bankaccount_created_UU) AS evento_objetivo,
+SUM(install) AS Instalaciones,
+CASE 
+    WHEN SUM(bankaccount_created_UU) = 0 OR SUM(install) = 0 THEN 0
+    ELSE SUM(bankaccount_created_UU) / SUM(install) 
+END AS cvr 
+FROM (
+SELECT 
+    fecha,
+    REGEXP_REPLACE(
+        nombre_campana, 
+        r'BOOMIT_PEIG_', 
+        'BOOMIT_DEMO_'
+    ) AS nombre_campana,
+    (SELECT `dimensiones.Data_Cruda.codigo_plataforma`(SPLIT(nombre_campana, '_')[OFFSET(3)])) AS plataforma,
+    costo_total,
+    bankaccount_created_UU,
+    install
+FROM `peigo-boomit.Dashboard.tabla_final`
+WHERE nombre_campana LIKE '%BOOMIT%'
+    AND fecha >= (DATE_ADD(CURRENT_DATE(), INTERVAL -15 DAY)) 
+    AND (SELECT `dimensiones.Data_Cruda.codigo_estrategia`(SPLIT(nombre_campana, '_')[OFFSET(4)])) 
+        IN UNNEST(['PERFORMANCE', 'PURCHASE', 'TRAFICO', 'ADQUISICION', 'RETENCION', 
+        'RECOMPRADORES', 'RETENCION Y RECOMPRADORES', 'CAPTACION', 'RETARGETING'])
+)
+GROUP BY fecha, nombre_campana, plataforma
+HAVING SUM(costo_total) > 0"""
     elif client == ProyectosNames.TRADERPAL.value:
         query = """select
-        fecha as Fecha,
-        nombre_campana as Campania,
-        plataforma as Plataforma,
-        sum(costo_total) as inversion,
-        sum(sng_first_funding) as evento_objetivo,
-        sum(installs) as evento_inicial,
-        case
-          when sum(sng_first_funding) = 0 or sum(installs) = 0 then 0
-          else sum(sng_first_funding) / sum(installs)
-        end as CVR
-        from (
-          SELECT
-          fecha,
-          nombre_campana,
-          (SELECT `dimensiones.Data_Cruda.codigo_plataforma`(SPLIT(nombre_campana, '_')[OFFSET(3)])) AS plataforma,
-          costo_total,
-          sng_first_funding,
-          installs
-          FROM `traderpal-boomit.Dashboard.tabla_final`
-          WHERE nombre_campana LIKE '%BOOMIT%'
-          AND fecha >= (DATE_ADD(CURRENT_DATE(), INTERVAL -15 DAY))
-          AND (SELECT `dimensiones.Data_Cruda.codigo_estrategia`(SPLIT(nombre_campana, '_')[OFFSET(4)]))
-            IN UNNEST(['PERFORMANCE', 'PURCHASE', 'TRAFICO', 'ADQUISICION', 'RETENCION',
-            'RECOMPRADORES', 'RETENCION Y RECOMPRADORES', 'CAPTACION', 'RETARGETING'])
-        )
-        GROUP BY fecha, nombre_campana, plataforma
-        HAVING SUM(costo_total) > 0"""
+fecha as Fecha,
+nombre_campana as Campania,
+plataforma as Plataforma,
+sum(costo_total) as inversion,
+sum(sng_first_funding) as evento_objetivo,
+sum(installs) as evento_inicial,
+case
+  when sum(sng_first_funding) = 0 or sum(installs) = 0 then 0
+  else sum(sng_first_funding) / sum(installs)
+end as CVR
+from (
+  SELECT
+  fecha,
+  nombre_campana,
+  (SELECT `dimensiones.Data_Cruda.codigo_plataforma`(SPLIT(nombre_campana, '_')[OFFSET(3)])) AS plataforma,
+  costo_total,
+  sng_first_funding,
+  installs
+  FROM `traderpal-boomit.Dashboard.tabla_final`
+  WHERE nombre_campana LIKE '%BOOMIT%'
+  AND fecha >= (DATE_ADD(CURRENT_DATE(), INTERVAL -15 DAY))
+  AND (SELECT `dimensiones.Data_Cruda.codigo_estrategia`(SPLIT(nombre_campana, '_')[OFFSET(4)]))
+    IN UNNEST(['PERFORMANCE', 'PURCHASE', 'TRAFICO', 'ADQUISICION', 'RETENCION',
+    'RECOMPRADORES', 'RETENCION Y RECOMPRADORES', 'CAPTACION', 'RETARGETING'])
+)
+GROUP BY fecha, nombre_campana, plataforma
+HAVING SUM(costo_total) > 0"""
 
     if query is None:
         raise ValueError(f"Client '{client}' is not recognized.")
@@ -269,119 +269,110 @@ HAVING SUM(costo_total) > 0"""
         query = """ TODO"""
     elif client == ProyectosNames.ALIGE_ALLIANZ_AHORRO.value:
         query = f"""SELECT 
-                    max(fecha) as period_current_end,
-                    (DATE_ADD(max(fecha), INTERVAL -6 DAY)) as period_current_start,
-                    (DATE_ADD(max(fecha), INTERVAL -13 DAY)) as period_previous_start,
-                    (DATE_ADD(max(fecha), INTERVAL -7 DAY)) as period_previous_end,
-                    FROM (
-                    SELECT 
-                    fecha as Fecha,
-                    nombre_campana as Campania,
-                    plataforma as Plataforma,
-                    SUM(costo_total) AS inversion,
-                    FROM (
-                        SELECT 
-                        fecha,
-                        nombre_campana,
-                        (SELECT `dimensiones.Data_Cruda.codigo_plataforma`(SPLIT(nombre_campana, '_')[OFFSET(3)])) AS plataforma,
-                        costo_total,
-                        FROM `alige-boomit.Dashboard.tabla_final`
-                        WHERE nombre_campana LIKE '%BOOMIT%'
-                        AND fecha >= (DATE_ADD(CURRENT_DATE(), INTERVAL -15 DAY)) 
-                        AND (SELECT `dimensiones.Data_Cruda.codigo_estrategia`(SPLIT(nombre_campana, '_')[OFFSET(4)])) 
-                            IN UNNEST(['PERFORMANCE', 'PURCHASE', 'TRAFICO', 'ADQUISICION', 'RETENCION', 
-                            'RECOMPRADORES', 'RETENCION Y RECOMPRADORES', 'CAPTACION', 'RETARGETING'])
-                        AND flag_producto = '{SubProyectosNames.ALIGE_ALLIANZ_AHORRO.value}'
-                        ) 
-                        GROUP BY fecha, nombre_campana, plataforma
-                        HAVING SUM(costo_total) > 0)"""
+max(fecha) as period_current_end,
+(DATE_ADD(max(fecha), INTERVAL -6 DAY)) as period_current_start,
+(DATE_ADD(max(fecha), INTERVAL -13 DAY)) as period_previous_start,
+(DATE_ADD(max(fecha), INTERVAL -7 DAY)) as period_previous_end,
+FROM (
+SELECT 
+fecha as Fecha,
+nombre_campana as Campania,
+plataforma as Plataforma,
+SUM(costo_total) AS inversion,
+FROM (
+    SELECT 
+    fecha,
+    nombre_campana,
+    (SELECT `dimensiones.Data_Cruda.codigo_plataforma`(SPLIT(nombre_campana, '_')[OFFSET(3)])) AS plataforma,
+    costo_total,
+    FROM `alige-boomit.Dashboard.tabla_final`
+    WHERE nombre_campana LIKE '%BOOMIT%'
+    AND fecha >= (DATE_ADD(CURRENT_DATE(), INTERVAL -15 DAY)) 
+    AND (SELECT `dimensiones.Data_Cruda.codigo_estrategia`(SPLIT(nombre_campana, '_')[OFFSET(4)])) 
+        IN UNNEST(['PERFORMANCE', 'PURCHASE', 'TRAFICO', 'ADQUISICION', 'RETENCION', 
+        'RECOMPRADORES', 'RETENCION Y RECOMPRADORES', 'CAPTACION', 'RETARGETING'])
+    AND flag_producto = '{SubProyectosNames.ALIGE_ALLIANZ_AHORRO.value}'
+    ) 
+    GROUP BY fecha, nombre_campana, plataforma
+    HAVING SUM(costo_total) > 0)"""
     elif client == ProyectosNames.ALIGE_ALLIANZ_VIDA.value:
         query = f"""SELECT
-                    max(fecha) as period_current_end,
-                    (DATE_ADD(max(fecha), INTERVAL -6 DAY)) as period_current_start,
-                    (DATE_ADD(max(fecha), INTERVAL -13 DAY)) as period_previous_start,
-                    (DATE_ADD(max(fecha), INTERVAL -7 DAY)) as period_previous_end,
-                    FROM (
-                    SELECT
-                    fecha as Fecha,
-                    nombre_campana as Campania,
-                    plataforma as Plataforma,
-                    SUM(costo_total) AS inversion,
-                    FROM (
-                        SELECT
-                        fecha,
-                        nombre_campana,
-                        (SELECT `dimensiones.Data_Cruda.codigo_plataforma`(SPLIT(nombre_campana, '_')[OFFSET(3)])) AS plataforma,
-                        costo_total,
-                        FROM `alige-boomit.Dashboard.tabla_final`
-                        WHERE nombre_campana LIKE '%BOOMIT%'
-                        AND fecha >= (DATE_ADD(CURRENT_DATE(), INTERVAL -15 DAY))
-                        AND (SELECT `dimensiones.Data_Cruda.codigo_estrategia`(SPLIT(nombre_campana, '_')[OFFSET(4)]))
-                            IN UNNEST(['PERFORMANCE', 'PURCHASE', 'TRAFICO', 'ADQUISICION', 'RETENCION',
-                            'RECOMPRADORES', 'RETENCION Y RECOMPRADORES', 'CAPTACION', 'RETARGETING'])
-                        AND flag_producto = '{SubProyectosNames.ALIGE_ALLIANZ_VIDA.value}'
-                    )
-                    GROUP BY fecha, nombre_campana, plataforma
-                    HAVING SUM(costo_total) > 0)"""
+max(fecha) as period_current_end,
+(DATE_ADD(max(fecha), INTERVAL -6 DAY)) as period_current_start,
+(DATE_ADD(max(fecha), INTERVAL -13 DAY)) as period_previous_start,
+(DATE_ADD(max(fecha), INTERVAL -7 DAY)) as period_previous_end,
+FROM (
+SELECT
+fecha as Fecha,
+nombre_campana as Campania,
+plataforma as Plataforma,
+SUM(costo_total) AS inversion,
+FROM (
+    SELECT
+    fecha,
+    nombre_campana,
+    (SELECT `dimensiones.Data_Cruda.codigo_plataforma`(SPLIT(nombre_campana, '_')[OFFSET(3)])) AS plataforma,
+    costo_total,
+    FROM `alige-boomit.Dashboard.tabla_final`
+    WHERE nombre_campana LIKE '%BOOMIT%'
+    AND fecha >= (DATE_ADD(CURRENT_DATE(), INTERVAL -15 DAY))
+    AND (SELECT `dimensiones.Data_Cruda.codigo_estrategia`(SPLIT(nombre_campana, '_')[OFFSET(4)]))
+        IN UNNEST(['PERFORMANCE', 'PURCHASE', 'TRAFICO', 'ADQUISICION', 'RETENCION',
+        'RECOMPRADORES', 'RETENCION Y RECOMPRADORES', 'CAPTACION', 'RETARGETING'])
+    AND flag_producto = '{SubProyectosNames.ALIGE_ALLIANZ_VIDA.value}'
+)
+GROUP BY fecha, nombre_campana, plataforma
+HAVING SUM(costo_total) > 0)"""
     elif client == ProyectosNames.ALIGE_SKANDIA_AHORRO.value:
         query = f"""SELECT
-                    max(fecha) as period_current_end,
-                    (DATE_ADD(max(fecha), INTERVAL -6 DAY)) as period_current_start,
-                    (DATE_ADD(max(fecha), INTERVAL -13 DAY)) as period_previous_start,
-                    (DATE_ADD(max(fecha), INTERVAL -7 DAY)) as period_previous_end,
-                    FROM (
-                    SELECT
-                    fecha as Fecha,
-                    nombre_campana as Campania,
-                    plataforma as Plataforma,
-                    SUM(costo_total) AS inversion,
-                    FROM (
-                        SELECT
-                        fecha,
-                        nombre_campana,
-                        (SELECT `dimensiones.Data_Cruda.codigo_plataforma`(SPLIT(nombre_campana, '_')[OFFSET(3)])) AS plataforma,
-                        costo_total,
-                        FROM `alige-boomit.Dashboard.tabla_final`
-                        WHERE nombre_campana LIKE '%BOOMIT%'
-                        AND fecha >= (DATE_ADD(CURRENT_DATE(), INTERVAL -15 DAY))
-                        AND (SELECT `dimensiones.Data_Cruda.codigo_estrategia`(SPLIT(nombre_campana, '_')[OFFSET(4)]))
-                            IN UNNEST(['PERFORMANCE', 'PURCHASE', 'TRAFICO', 'ADQUISICION', 'RETENCION',
-                            'RECOMPRADORES', 'RETENCION Y RECOMPRADORES', 'CAPTACION', 'RETARGETING'])
-                        AND flag_producto = '{SubProyectosNames.ALIGE_SKANDIA_AHORRO.value}'
-                    )
-                    GROUP BY fecha, nombre_campana, plataforma
-                    HAVING SUM(costo_total) > 0)"""
+max(fecha) as period_current_end,
+(DATE_ADD(max(fecha), INTERVAL -6 DAY)) as period_current_start,
+(DATE_ADD(max(fecha), INTERVAL -13 DAY)) as period_previous_start,
+(DATE_ADD(max(fecha), INTERVAL -7 DAY)) as period_previous_end,
+FROM (
+SELECT
+fecha as Fecha,
+nombre_campana as Campania,
+plataforma as Plataforma,
+SUM(costo_total) AS inversion,
+FROM (
+    SELECT
+    fecha,
+    nombre_campana,
+    (SELECT `dimensiones.Data_Cruda.codigo_plataforma`(SPLIT(nombre_campana, '_')[OFFSET(3)])) AS plataforma,
+    costo_total,
+    FROM `alige-boomit.Dashboard.tabla_final`
+    WHERE nombre_campana LIKE '%BOOMIT%'
+    AND fecha >= (DATE_ADD(CURRENT_DATE(), INTERVAL -15 DAY))
+    AND (SELECT `dimensiones.Data_Cruda.codigo_estrategia`(SPLIT(nombre_campana, '_')[OFFSET(4)]))
+        IN UNNEST(['PERFORMANCE', 'PURCHASE', 'TRAFICO', 'ADQUISICION', 'RETENCION',
+        'RECOMPRADORES', 'RETENCION Y RECOMPRADORES', 'CAPTACION', 'RETARGETING'])
+    AND flag_producto = '{SubProyectosNames.ALIGE_SKANDIA_AHORRO.value}'
+)
+GROUP BY fecha, nombre_campana, plataforma
+HAVING SUM(costo_total) > 0)"""
     elif client == ProyectosNames.DEMO.value:
-        query = """SELECT
-                    max(fecha) as period_current_end,
-                    (DATE_ADD(max(fecha), INTERVAL -6 DAY)) as period_current_start,
-                    (DATE_ADD(max(fecha), INTERVAL -13 DAY)) as period_previous_start,
-                    (DATE_ADD(max(fecha), INTERVAL -7 DAY)) as period_previous_end,
-                    FROM (
-                    SELECT
-                    fecha as Fecha,
-                    Campaign as Campania,
-                    plataforma as Plataforma,
-                    SUM(total_cost) AS inversion,
-                    FROM (
-                    SELECT
-                        fecha,
-                        REGEXP_REPLACE(
-                            Campaign,
-                            r'BOOMIT_PEIG_',
-                            'BOOMIT_DEMO_'
-                        ) AS Campaign,
-                        (SELECT `dimensiones.Data_Cruda.codigo_plataforma`(SPLIT(Campaign, '_')[OFFSET(3)])) AS plataforma,
-                        total_cost,
-                    FROM `peigo-boomit.Datos_Dash.Android_IOS_Raw_AF`
-                    WHERE Campaign LIKE '%BOOMIT%'
-                        AND fecha >= (DATE_ADD(CURRENT_DATE(), INTERVAL -15 DAY))
-                        AND (SELECT `dimensiones.Data_Cruda.codigo_estrategia`(SPLIT(Campaign, '_')[OFFSET(4)]))
-                            IN UNNEST(['PERFORMANCE', 'PURCHASE', 'TRAFICO', 'ADQUISICION', 'RETENCION',
-                            'RECOMPRADORES', 'RETENCION Y RECOMPRADORES', 'CAPTACION', 'RETARGETING'])
-                    )
-                    GROUP BY fecha, Campaign, plataforma
-                    HAVING SUM(total_cost) > 0)"""
+        query = """SELECT 
+max(fecha) as period_current_end,
+(DATE_ADD(max(fecha), INTERVAL -6 DAY)) as period_current_start,
+(DATE_ADD(max(fecha), INTERVAL -13 DAY)) as period_previous_start,
+(DATE_ADD(max(fecha), INTERVAL -7 DAY)) as period_previous_end,
+FROM (
+SELECT 
+    fecha,
+    nombre_campana,
+    (SELECT `dimensiones.Data_Cruda.codigo_plataforma`(SPLIT(nombre_campana, '_')[OFFSET(3)])) AS plataforma,
+    costo_total,
+    bankaccount_created_UU,
+    install
+FROM `peigo-boomit.Dashboard.tabla_final`
+WHERE nombre_campana LIKE '%BOOMIT%'
+    AND fecha >= (DATE_ADD(CURRENT_DATE(), INTERVAL -15 DAY)) 
+    AND (SELECT `dimensiones.Data_Cruda.codigo_estrategia`(SPLIT(nombre_campana, '_')[OFFSET(4)])) 
+        IN UNNEST(['PERFORMANCE', 'PURCHASE', 'TRAFICO', 'ADQUISICION', 'RETENCION', 
+        'RECOMPRADORES', 'RETENCION Y RECOMPRADORES', 'CAPTACION', 'RETARGETING'])
+) 
+HAVING SUM(costo_total) > 0"""
     if query is None:
         raise ValueError(f"Client '{client}' is not recognized.")
 
