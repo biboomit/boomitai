@@ -258,7 +258,7 @@ HAVING SUM(costo_total) > 0"""
   sng_first_funding,
   installs
   FROM `traderpal-boomit.Dashboard.tabla_final`
-  WHERE nombre_campana LIKE '%BOOMIT%'
+  WHERE nombre_campana LIKE '%BOOMIT_%'
   AND fecha >= (DATE_ADD(CURRENT_DATE(), INTERVAL -15 DAY))
   AND (SELECT `dimensiones.Data_Cruda.codigo_estrategia`(SPLIT(nombre_campana, '_')[OFFSET(4)]))
     IN UNNEST(['PERFORMANCE', 'PURCHASE', 'TRAFICO', 'ADQUISICION', 'RETENCION',
