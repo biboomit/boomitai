@@ -44,7 +44,7 @@ SELECT
     bankaccount_created_UU,
     install
 FROM `peigo-boomit.Dashboard.tabla_final`
-WHERE nombre_campana LIKE '%BOOMIT%'
+WHERE nombre_campana LIKE '%BOOMIT%' and flag_tipo_reporte = 'Activity'
     AND fecha >= (DATE_ADD(CURRENT_DATE(), INTERVAL -15 DAY)) 
     AND (SELECT `dimensiones.Data_Cruda.codigo_estrategia`(SPLIT(nombre_campana, '_')[OFFSET(4)])) 
         IN UNNEST(['PERFORMANCE', 'PURCHASE', 'TRAFICO', 'ADQUISICION', 'RETENCION', 
