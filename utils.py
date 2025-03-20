@@ -254,7 +254,7 @@ def retrieve_assistant_created_files(message_list: list[str]) -> list[str]:
 
     return assistant_created_file_ids
 
-@st.experimental_fragment
+@st.fragment
 def render_download_files(file_id_list: list[str]) -> Tuple[list[bytes], list[str]]:
     """
     Download the files, renders a download button for each file, and returns the downloaded files

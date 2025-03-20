@@ -7,7 +7,7 @@ PROJECT_ROOT = Path(__file__).parent.parent
 
 # Define paths
 prompt1_path = PROJECT_ROOT / 'optimization' / 'codigo' / 'prompt1.py'
-datos_path = PROJECT_ROOT / 'optimization' / 'file' / 'bquxjob_157d5c5d_1941367a86e.csv'
+datos_path = PROJECT_ROOT / 'optimization' / 'file' / 'datos2.csv'
 
 # Read the CSV data
 csv_data = pd.read_csv(datos_path)

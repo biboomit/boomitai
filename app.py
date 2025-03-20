@@ -157,45 +157,23 @@ if show_client_dropdown:
 
             render_conversation_history()
 
-            # Get data from the database and store it in the session state
-            StateManager.update_state("gbq_data", bbdd.get_data(cliente_seleccionado))
+            # # Get data from the database and store it in the session state
+            # StateManager.update_state("gbq_data", bbdd.get_data(cliente_seleccionado))
 
-            # Eliminar caracteres extraños como comillas dobles, barras invertidas, etc.
-            gbq_data = StateManager.get_state("gbq_data")
-            gbq_data["inversion"] = gbq_data["inversion"].replace(
-                r"[\"\\]", "", regex=True
-            )
-            gbq_data["inversion"] = pd.to_numeric(
-                gbq_data["inversion"], errors="coerce"
-            )
-            StateManager.update_state("gbq_data", gbq_data)
+            # # Eliminar caracteres extraños como comillas dobles, barras invertidas, etc.
+            # gbq_data = StateManager.get_state("gbq_data")
+            # gbq_data["inversion"] = gbq_data["inversion"].replace(
+            #     r"[\"\\]", "", regex=True
+            # )
+            # gbq_data["inversion"] = pd.to_numeric(
+            #     gbq_data["inversion"], errors="coerce"
+            # )
+            # StateManager.update_state("gbq_data", gbq_data)
 
-            # Checkbox para mostrar preview del DataFrame
-            if st.checkbox("Mostrar preview de los datos", value=True):
-                # Display a sample of the data to verify it has been loaded correctly
-                st.write(st.session_state.gbq_data)
-
-            # Ahora, en lugar de subir el archivo, almacena el DataFrame en la sesión para usarlo en prompts futuros
-            # st.write("Los datos del cliente han sido cargados y están listos para usar en las consultas.")
-
-            # Obtener la hora actual
-            now = datetime.now()
-            # Formatear la fecha y hora actual en el formato deseado
-            timestamp = now.strftime("%Y%m%d%H%M%S")
-
-            file_name = f"datos.jsonl"
-
-            if not StateManager.get_state("file_id"):
-                file_info = upload_file(
-                    StateManager.get_state("gbq_data").to_csv(index=False), file_name
-                )
-                StateManager.bulk_update(
-                    {
-                        "file_id": file_info["id"],
-                        "files_to_delete": StateManager.get_state("files_to_delete", [])
-                        + [file_info["id"]],
-                    }
-                )
+            # # Checkbox para mostrar preview del DataFrame
+            # if st.checkbox("Mostrar preview de los datos", value=True):
+            #     # Display a sample of the data to verify it has been loaded correctly
+            #     st.write(st.session_state.gbq_data)
 
             # Initialise the OpenAI client, and retrieve the assistant
             client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
@@ -219,6 +197,24 @@ if show_client_dropdown:
             with col1:
                 if st.button("Preguntar a Boomit AI"):
                     st.caption("Procesando. Aguarde por favor...")
+                    
+                    query = bbdd.obtenerQuery(titulo_abreviado, cliente_seleccionado)
+                    
+                    StateManager.update_state("gbq_data", bbdd.get_data_with_query(query, cliente_seleccionado))
+                    
+                    file_name = f"datos.jsonl"
+
+                    if not StateManager.get_state("file_id"):
+                        file_info = upload_file(
+                            StateManager.get_state("gbq_data").to_csv(index=False), file_name
+                        )
+                        StateManager.bulk_update(
+                            {
+                                "file_id": file_info["id"],
+                                "files_to_delete": StateManager.get_state("files_to_delete", [])
+                                + [file_info["id"]],
+                            }
+                        )
 
                     # Initialize response parameters
                     question = Manager().obtenerPrompt(
